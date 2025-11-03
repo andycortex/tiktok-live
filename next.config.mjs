@@ -9,7 +9,7 @@ const nextConfig = {
     ],
   },
   experimental: {
-    serverComponentsExternalPackages: ['mysql2'],
+    serverComponentsExternalPackages: ['mysql2', 'tiktok-live-connector'], // Add tiktok-live-connector
   },
 };
 

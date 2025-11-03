@@ -1,41 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useRef } from 'react'; // Import useRef
 
-const mockComments = [
-  {
-    user: 'user1',
-    comment: '¡Hola! ¡Qué buen live!',
-    avatar: 'https://picsum.photos/seed/user1/32/32'
-  },
-  {
-    user: 'user2',
-    comment: '¿Desde dónde transmites?',
-    avatar: 'https://picsum.photos/seed/user2/32/32'
-  },
-  {
-    user: 'user3',
-    comment: '¡Me encanta tu contenido!',
-    avatar: 'https://picsum.photos/seed/user3/32/32'
-  },
-];
+const Comments = ({ comments }) => { // Accept comments prop
+  const commentsEndRef = useRef(null); // Ref for auto-scrolling
 
-const Comments = () => {
-  const [comments, setComments] = useState(mockComments);
-
-  // Simulate new comments
+  // Auto-scroll to the latest comment
   useEffect(() => {
-    const interval = setInterval(() => {
-      const newComment = {
-        user: `user${Math.floor(Math.random() * 100)}`,
-        comment: 'Este es un nuevo comentario.',
-        avatar: `https://picsum.photos/seed/user${Math.floor(Math.random() * 100)}/32/32`
-      };
-      setComments(prevComments => [...prevComments, newComment]);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
+    commentsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [comments]);
 
   return (
     <aside className="w-96 ml-4 flex flex-col">
@@ -56,15 +29,20 @@ const Comments = () => {
         </div>
       </div>
       <div id="commentsContainer" className="flex-1 bg-white overflow-y-auto scrollbar-hide p-4 space-y-3 shadow-inner">
-        {comments.map((comment, index) => (
-          <div key={index} className="flex items-start gap-3 comment-enter">
-            <img src={comment.avatar} alt={comment.user} className="w-8 h-8 rounded-full" />
-            <div>
-              <p className="text-sm font-semibold">@{comment.user}</p>
-              <p className="text-sm">{comment.comment}</p>
+        {comments.length === 0 ? (
+          <p className="text-gray-500 text-sm text-center">No comments yet. Connect to a live stream!</p>
+        ) : (
+          comments.map((comment, index) => (
+            <div key={index} className="flex items-start gap-3 comment-enter">
+              <img src={comment.avatar} alt={comment.user} className="w-8 h-8 rounded-full" />
+              <div>
+                <p className="text-sm font-semibold">{comment.user}</p>
+                <p className="text-sm">{comment.comment}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
+        <div ref={commentsEndRef} /> {/* Element to scroll to */}
       </div>
     </aside>
   );

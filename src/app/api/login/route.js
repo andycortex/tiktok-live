@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import { SignJWT } from 'jose'; // Import SignJWT from jose
 import { serialize } from 'cookie';
 
 export async function POST(req) {
@@ -25,12 +25,13 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    // Generate JWT
-    const token = jwt.sign(
-      { userId: user.id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' } // Token expires in 1 hour
-    );
+    // Generate JWT using jose
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    const token = await new SignJWT({ userId: user.id, email: user.email })
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('1h') // Token expires in 1 hour
+      .sign(secret);
 
     // Set JWT as an HTTP-only cookie
     const serialized = serialize('token', token, {
