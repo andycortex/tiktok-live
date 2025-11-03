@@ -1,5 +1,4 @@
-
-const LiveHeader = () => {
+const LiveHeader = ({ onLogout }) => {
   return (
     <header className="bg-white/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-gray-200 shadow-sm">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -16,6 +15,14 @@ const LiveHeader = () => {
             <i className="fas fa-eye mr-1"></i>
             <span id="viewerCount">12.5K</span> espectadores
           </span>
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              className="bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded-full text-sm font-semibold text-gray-700 transition-colors"
+            >
+              Cerrar Sesión
+            </button>
+          )}
         </div>
       </div>
     </header>

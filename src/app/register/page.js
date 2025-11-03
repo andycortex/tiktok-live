@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Import useEffect
+import { useRouter } from 'next/navigation'; // Import useRouter
 import Header from '@/components/Header';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
@@ -22,6 +23,16 @@ const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if user is already logged in (e.g., by checking for a 'token' cookie)
+    // This check is simplified; a real app would verify the token's validity.
+    const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
+    if (token) {
+      router.push('/live');
+    }
+  }, [router]);
 
   const handleInputChange = (field) => (value) => {
     setFormData({ ...formData, [field]: value });
@@ -47,6 +58,8 @@ const RegisterPage = () => {
       }
 
       setSuccess(true);
+      // Optionally redirect to login page after successful registration
+      // router.push('/login');
     } catch (error) {
       setError(error.message);
     } finally {

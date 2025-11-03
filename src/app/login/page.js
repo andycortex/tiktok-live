@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react'; // Import useEffect
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -16,13 +16,9 @@ const LoginPage = () => {
   const [success, setSuccess] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    // Check if user is already logged in (e.g., from localStorage)
-    const isLoggedIn = localStorage.getItem('isLoggedIn'); // Simulate logged-in state
-    if (isLoggedIn) {
-      router.push('/live');
-    }
-  }, [router]); // Run once on component mount
+  // The redirection logic for already logged-in users will now be handled by middleware.
+  // This useEffect is no longer needed for that purpose.
+  // However, we still need to redirect after a successful login.
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,8 +40,8 @@ const LoginPage = () => {
       }
 
       setSuccess(true);
-      localStorage.setItem('isLoggedIn', 'true'); // Simulate setting logged-in state
-      router.push('/live');
+      // No need to set localStorage.setItem('isLoggedIn', 'true'); anymore
+      router.push('/live'); // Redirect to /live on successful login
     } catch (error) {
       setError(error.message);
     } finally {
@@ -114,24 +110,7 @@ const LoginPage = () => {
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">Iniciar Sesión</h1>
                     <p className="text-gray-600 text-sm">Ingresa tus credenciales para acceder</p>
                   </div>
-                  <div className="space-y-3 mb-6">
-                    <button type="button" className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors social-btn">
-                      <i className="fab fa-google text-red-500"></i>
-                      <span className="text-sm font-medium text-gray-700">Continuar con Google</span>
-                    </button>
-                    <button type="button" className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors social-btn">
-                      <i className="fab fa-apple text-gray-800"></i>
-                      <span className="text-sm font-medium text-gray-700">Continuar con Apple</span>
-                    </button>
-                  </div>
-                  <div className="relative mb-6">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white text-gray-500">O continúa con email</span>
-                    </div>
-                  </div>
+                 
                   {success ? (
                     <div className="text-center">
                       <h2 className="text-2xl font-bold text-green-600">¡Inicio de sesión exitoso!</h2>
