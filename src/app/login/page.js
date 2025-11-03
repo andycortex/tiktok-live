@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import Card from '@/components/Card';
+import { useUser } from '@/context/UserContext';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -15,10 +16,7 @@ const LoginPage = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
-
-  // The redirection logic for already logged-in users will now be handled by middleware.
-  // This useEffect is no longer needed for that purpose.
-  // However, we still need to redirect after a successful login.
+  const { setUser } = useUser();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,9 +37,10 @@ const LoginPage = () => {
         throw new Error(errorData.error || 'Something went wrong');
       }
 
+      const responseData = await response.json();
       setSuccess(true);
-      // No need to set localStorage.setItem('isLoggedIn', 'true'); anymore
-      router.push('/live'); // Redirect to /live on successful login
+      setUser(responseData.user); // Update global user state
+      router.push('/live');
     } catch (error) {
       setError(error.message);
     } finally {
@@ -110,7 +109,6 @@ const LoginPage = () => {
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">Iniciar Sesión</h1>
                     <p className="text-gray-600 text-sm">Ingresa tus credenciales para acceder</p>
                   </div>
-                 
                   {success ? (
                     <div className="text-center">
                       <h2 className="text-2xl font-bold text-green-600">¡Inicio de sesión exitoso!</h2>

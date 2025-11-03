@@ -88,7 +88,7 @@ app.post('/connect', async (req, res) => {
     });
 
     tiktokConnection.on('error', (err) => {
-      console.error(`Error in connection with @${uniqueId}:`, err);
+      console.error(`Error in connection with ${uniqueId}:`, err);
       broadcast({ type: 'error', uniqueId, error: err.message });
       activeConnections.delete(uniqueId);
     });

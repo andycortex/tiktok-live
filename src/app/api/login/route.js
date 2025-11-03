@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcrypt';
-import { SignJWT } from 'jose'; // Import SignJWT from jose
+import { SignJWT } from 'jose';
 import { serialize } from 'cookie';
 
 export async function POST(req) {
@@ -25,28 +25,40 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    // Generate JWT using jose
+    // Generate JWT
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const token = await new SignJWT({ userId: user.id, email: user.email })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
-      .setExpirationTime('1h') // Token expires in 1 hour
+      .setExpirationTime('1h')
       .sign(secret);
 
     // Set JWT as an HTTP-only cookie
     const serialized = serialize('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 60 * 60, // 1 hour
+      maxAge: 60 * 60,
       path: '/',
     });
 
-    return new NextResponse(JSON.stringify({ message: 'Login successful' }), {
+    const userDataToReturn = {
+      id: user.id,
+      email: user.email,
+      nombre: user.nombre,
+      tiktok: user.tiktok, // Include tiktok username
+    };
+    console.log('Login API: User data being returned:', userDataToReturn); // Log user data
+
+    return new NextResponse(JSON.stringify({
+      message: 'Login successful',
+      user: userDataToReturn,
+    }), {
       status: 200,
       headers: { 'Set-Cookie': serialized },
     });
   } catch (error) {
+    console.error('Login API: Error in try block:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

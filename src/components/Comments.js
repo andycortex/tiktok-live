@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'; // Import useRef
 
 const Comments = ({ comments }) => { // Accept comments prop
+  
   const commentsEndRef = useRef(null); // Ref for auto-scrolling
 
   // Auto-scroll to the latest comment
@@ -36,7 +37,7 @@ const Comments = ({ comments }) => { // Accept comments prop
             <div key={index} className="flex items-start gap-3 comment-enter">
               <img src={comment.avatar} alt={comment.user} className="w-8 h-8 rounded-full" />
               <div>
-                <p className="text-sm font-semibold">{comment.user}</p>
+                <p className="text-sm font-semibold">{comment.user.nickname}</p>
                 <p className="text-sm">{comment.comment}</p>
               </div>
             </div>
