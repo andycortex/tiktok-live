@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Import useEffect
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
@@ -10,11 +11,46 @@ import Card from '@/components/Card';
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    // Check if user is already logged in (e.g., from localStorage)
+    const isLoggedIn = localStorage.getItem('isLoggedIn'); // Simulate logged-in state
+    if (isLoggedIn) {
+      router.push('/live');
+    }
+  }, [router]); // Run once on component mount
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log({ email, password });
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Something went wrong');
+      }
+
+      setSuccess(true);
+      localStorage.setItem('isLoggedIn', 'true'); // Simulate setting logged-in state
+      router.push('/live');
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -96,25 +132,42 @@ const LoginPage = () => {
                       <span className="px-2 bg-white text-gray-500">O continúa con email</span>
                     </div>
                   </div>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <Input id="email" label="Email o Usuario" type="text" required placeholder="usuario@ejemplo.com" icon="fas fa-envelope" onStateChange={setEmail} />
-                    <Input id="password" label="Contraseña" type="password" required placeholder="••••••" icon="fas fa-lock" onStateChange={setPassword} />
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <input type="checkbox" id="remember" name="remember" className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" />
-                        <label htmlFor="remember" className="ml-2 text-sm text-gray-600">
-                          Recordarme
-                        </label>
-                      </div>
-                      <a href="#" className="text-sm text-purple-600 hover:text-purple-700 font-medium">
-                        ¿Olvidaste tu contraseña?
-                      </a>
+                  {success ? (
+                    <div className="text-center">
+                      <h2 className="text-2xl font-bold text-green-600">¡Inicio de sesión exitoso!</h2>
+                      <p className="text-gray-600 mt-2">Redirigiendo...</p>
                     </div>
-                    <Button type="submit" fullWidth>
-                      <i className="fas fa-sign-in-alt"></i>
-                      Iniciar Sesión
-                    </Button>
-                  </form>
+                  ) : (
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <Input id="email" label="Email o Usuario" type="text" required placeholder="usuario@ejemplo.com" icon="fas fa-envelope" onStateChange={setEmail} />
+                      <Input id="password" label="Contraseña" type="password" required placeholder="••••••" icon="fas fa-lock" onStateChange={setPassword} />
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <input type="checkbox" id="remember" name="remember" className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" />
+                          <label htmlFor="remember" className="ml-2 text-sm text-gray-600">
+                            Recordarme
+                          </label>
+                        </div>
+                        <a href="#" className="text-sm text-purple-600 hover:text-purple-700 font-medium">
+                          ¿Olvidaste tu contraseña?
+                        </a>
+                      </div>
+                      <Button type="submit" fullWidth disabled={loading}>
+                        {loading ? (
+                          <>
+                            <div className="loading-spinner"></div>
+                            Iniciando sesión...
+                          </>
+                        ) : (
+                          <>
+                            <i className="fas fa-sign-in-alt"></i>
+                            Iniciar Sesión
+                          </>
+                        )}
+                      </Button>
+                      {error && <p className="text-red-500 text-sm mt-4">Error: {error}</p>}
+                    </form>
+                  )}
                 </div>
               </div>
             </div>

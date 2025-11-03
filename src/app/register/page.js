@@ -19,15 +19,39 @@ const RegisterPage = () => {
     tiktok: '',
     terms: false,
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const handleInputChange = (field) => (value) => {
     setFormData({ ...formData, [field]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log(formData);
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Something went wrong');
+      }
+
+      setSuccess(true);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -44,64 +68,81 @@ const RegisterPage = () => {
               <p className="text-white/90">Crea tu cuenta y comienza a transmitir</p>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <i className="fas fa-user text-purple-600"></i>
-                    Información Personal
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input id="nombre" label="Nombre" required placeholder="Juan" icon="fas fa-user" onStateChange={handleInputChange('nombre')} />
-                    <Input id="apellido" label="Apellido" required placeholder="Pérez" icon="fas fa-user" onStateChange={handleInputChange('apellido')} />
+              {success ? (
+                <div className="text-center">
+                  <h2 className="text-2xl font-bold text-green-600">¡Registro exitoso!</h2>
+                  <p className="text-gray-600 mt-2">Tu cuenta ha sido creada. Ya puedes iniciar sesión.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <i className="fas fa-user text-purple-600"></i>
+                      Información Personal
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Input id="nombre" label="Nombre" required placeholder="Juan" icon="fas fa-user" onStateChange={handleInputChange('nombre')} />
+                      <Input id="apellido" label="Apellido" required placeholder="Pérez" icon="fas fa-user" onStateChange={handleInputChange('apellido')} />
+                    </div>
                   </div>
-                </div>
 
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <i className="fas fa-lock text-purple-600"></i>
-                    Información de Cuenta
-                  </h3>
-                  <Input id="email" label="Email (Usuario)" type="email" required placeholder="usuario@ejemplo.com" icon="fas fa-envelope" onStateChange={handleInputChange('email')} />
-                  <Input id="password" label="Contraseña" type="password" required minlength="6" placeholder="••••••" icon="fas fa-lock" onStateChange={handleInputChange('password')} />
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <i className="fas fa-phone text-purple-600"></i>
-                    Información de Contacto
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input id="whatsapp" label="WhatsApp" type="tel" required placeholder="+34 600 000 000" icon="fab fa-whatsapp" onStateChange={handleInputChange('whatsapp')} />
-                    <Input id="ciudad" label="Ciudad" required placeholder="Madrid" icon="fas fa-map-marker-alt" onStateChange={handleInputChange('ciudad')} />
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <i className="fas fa-lock text-purple-600"></i>
+                      Información de Cuenta
+                    </h3>
+                    <Input id="email" label="Email (Usuario)" type="email" required placeholder="usuario@ejemplo.com" icon="fas fa-envelope" onStateChange={handleInputChange('email')} />
+                    <Input id="password" label="Contraseña" type="password" required minlength="6" placeholder="••••••" icon="fas fa-lock" onStateChange={handleInputChange('password')} />
                   </div>
-                  <Input id="direccion" label="Dirección" required placeholder="Calle Principal, 123" icon="fas fa-home" onStateChange={handleInputChange('direccion')} />
-                </div>
 
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <i className="fas fa-briefcase text-purple-600"></i>
-                    Información Profesional
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input id="empresa" label="Empresa" required placeholder="Mi Empresa S.L." icon="fas fa-building" onStateChange={handleInputChange('empresa')} />
-                    <Input id="tiktok" label="Link de TikTok" type="url" required placeholder="@usuario_tiktok" icon="fab fa-tiktok" onStateChange={handleInputChange('tiktok')} />
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <i className="fas fa-phone text-purple-600"></i>
+                      Información de Contacto
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Input id="whatsapp" label="WhatsApp" type="tel" required placeholder="+34 600 000 000" icon="fab fa-whatsapp" onStateChange={handleInputChange('whatsapp')} />
+                      <Input id="ciudad" label="Ciudad" required placeholder="Madrid" icon="fas fa-map-marker-alt" onStateChange={handleInputChange('ciudad')} />
+                    </div>
+                    <Input id="direccion" label="Dirección" required placeholder="Calle Principal, 123" icon="fas fa-home" onStateChange={handleInputChange('direccion')} />
                   </div>
-                </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-start">
-                    <input type="checkbox" id="terms" name="terms" required className="mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" onChange={(e) => setFormData({...formData, terms: e.target.checked})} />
-                    <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
-                      Acepto los <a href="#" className="text-purple-600 hover:text-purple-700 font-medium">términos y condiciones</a>
-                      y la <a href="#" className="text-purple-600 hover:text-purple-700 font-medium">política de privacidad</a>
-                    </label>
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <i className="fas fa-briefcase text-purple-600"></i>
+                      Información Profesional
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Input id="empresa" label="Empresa" required placeholder="Mi Empresa S.L." icon="fas fa-building" onStateChange={handleInputChange('empresa')} />
+                      <Input id="tiktok" label="Link de TikTok" type="url" required placeholder="@usuario_tiktok" icon="fab fa-tiktok" onStateChange={handleInputChange('tiktok')} />
+                    </div>
                   </div>
-                  <Button type="submit" fullWidth>
-                    <i className="fas fa-user-plus"></i>
-                    Crear Cuenta
-                  </Button>
-                </div>
-              </form>
+
+                  <div className="space-y-4">
+                    <div className="flex items-start">
+                      <input type="checkbox" id="terms" name="terms" required className="mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500" onChange={(e) => setFormData({...formData, terms: e.target.checked})} />
+                      <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
+                        Acepto los <a href="#" className="text-purple-600 hover:text-purple-700 font-medium">términos y condiciones</a>
+                        y la <a href="#" className="text-purple-600 hover:text-purple-700 font-medium">política de privacidad</a>
+                      </label>
+                    </div>
+                    <Button type="submit" fullWidth disabled={loading}>
+                      {loading ? (
+                        <>
+                          <div className="loading-spinner"></div>
+                          Creando cuenta...
+                        </>
+                      ) : (
+                        <>
+                          <i className="fas fa-user-plus"></i>
+                          Crear Cuenta
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  {error && <p className="text-red-500 text-sm mt-4">Error: {error}</p>}
+                </form>
+              )}
             </CardContent>
           </Card>
         </div>
