@@ -125,3 +125,40 @@ body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.comment-enter {
+    animation: slideIn 0.3s ease-out;
+}
+
+.gift-animation {
+    animation: pulse 0.5s ease-in-out;
+}
+
+.live-pulse {
+    animation: pulse 2s infinite;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.gradient-border {
+    background: linear-gradient(45deg, #FF0050, #00F2EA);
+    padding: 2px;
+}
