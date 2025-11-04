@@ -114,8 +114,8 @@ const RegisterPage = () => {
                       Información de Contacto
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Input id="whatsapp" label="WhatsApp" type="tel" required placeholder="+34 600 000 000" icon="fab fa-whatsapp" onStateChange={handleInputChange('whatsapp')} />
-                      <Input id="ciudad" label="Ciudad" required placeholder="Madrid" icon="fas fa-map-marker-alt" onStateChange={handleInputChange('ciudad')} />
+                      <Input id="whatsapp" label="WhatsApp" type="tel" required placeholder="+591 700 000 00" icon="fab fa-whatsapp" onStateChange={handleInputChange('whatsapp')} />
+                      <Input id="ciudad" label="Ciudad" required placeholder="Tarija/Cercado" icon="fas fa-map-marker-alt" onStateChange={handleInputChange('ciudad')} />
                     </div>
                     <Input id="direccion" label="Dirección" required placeholder="Calle Principal, 123" icon="fas fa-home" onStateChange={handleInputChange('direccion')} />
                   </div>
@@ -127,7 +127,7 @@ const RegisterPage = () => {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Input id="empresa" label="Empresa" required placeholder="Mi Empresa S.L." icon="fas fa-building" onStateChange={handleInputChange('empresa')} />
-                      <Input id="tiktok" label="Link de TikTok" type="url" required placeholder="@usuario_tiktok" icon="fab fa-tiktok" onStateChange={handleInputChange('tiktok')} />
+                      <Input id="tiktok" label="Link de TikTok" type="url" required placeholder="https://www.tiktok.com/@usuario_tiktok" icon="fab fa-tiktok" onStateChange={handleInputChange('tiktok')} />
                     </div>
                   </div>
 
