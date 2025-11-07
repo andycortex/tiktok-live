@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TapTap - Tu asistente de Ventas 24/7</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+        }
+        
+        .phone-mockup {
+            transform: perspective(1000px) rotateY(-5deg);
+            transition: transform 0.3s ease;
+        }
+        
+        .phone-mockup:hover {
+            transform: perspective(1000px) rotateY(0deg);
+        }
+        
+        .stat-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <span class="text-3xl font-bold text-orange-500">TapTap</span>
+                    <svg class="w-10 h-10 text-blue-900" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 11l3 3L22 4"></path>
+                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+                        <circle cx="12" cy="12" r="1" fill="currentColor"></circle>
+                    </svg>
+                </div>
+                
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="text-orange-500 font-medium hover:text-orange-600 transition">Inicio</a>
+                    <a href="#" class="text-gray-700 hover:text-orange-500 transition">Instrucciones</a>
+                    <a href="#" class="text-gray-700 hover:text-orange-500 transition">Catálogo</a>
+                    <a href="#" class="text-gray-700 hover:text-orange-500 transition">Panel Vendedor</a>
+                    <a href="#" class="text-gray-700 hover:text-orange-500 transition">Portal Empresa</a>
+                </div>
+                
+                <!-- CTA Buttons -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <button class="px-6 py-2.5 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition">
+                        Mi cuenta
+                    </button>
+                    <button class="px-6 py-2.5 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition">
+                        Registrarse
+                    </button>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <div class="px-4 py-4 space-y-3">
+                <a href="#" class="block text-orange-500 font-medium">Inicio</a>
+                <a href="#" class="block text-gray-700">Instrucciones</a>
+                <a href="#" class="block text-gray-700">Catálogo</a>
+                <a href="#" class="block text-gray-700">Panel Vendedor</a>
+                <a href="#" class="block text-gray-700">Portal Empresa</a>
+                <div class="pt-4 space-y-2">
+                    <button class="w-full px-6 py-2.5 bg-black text-white rounded-lg font-medium">Mi cuenta</button>
+                    <button class="w-full px-6 py-2.5 bg-orange-500 text-white rounded-lg font-medium">Registrarse</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient py-16 lg:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Left Content -->
+                <div class="space-y-8">
+                    <h1 class="text-5xl lg:text-6xl font-black text-gray-900 leading-tight">
+                        Tu asistente de<br>
+                        <span class="text-gray-900">Ventas 24/7</span>
+                    </h1>
+                    
+                    <p class="text-lg text-gray-700 leading-relaxed max-w-xl">
+                        TapTap escucha tus transmisiones en vivo en tiktok y responde automáticamente por WhatsApp. Cierra ventas mientras sigues haciendo lo que amas.
+                    </p>
+                    
+                    <button class="px-8 py-4 bg-orange-500 text-white rounded-lg font-bold text-lg hover:bg-orange-600 transition shadow-lg hover:shadow-xl">
+                        Comienza Gratis!
+                    </button>
+                    
+                    <!-- Stats -->
+                    <div class="grid grid-cols-3 gap-6 pt-8">
+                        <div class="stat-card">
+                            <div class="text-4xl lg:text-5xl font-black text-orange-500">150+</div>
+                            <div class="text-sm text-gray-600 mt-2">Tiendas registrados</div>
+                        </div>
+                        <div class="stat-card" style="animation-delay: 0.2s">
+                            <div class="text-4xl lg:text-5xl font-black text-orange-500">50+</div>
+                            <div class="text-sm text-gray-600 mt-2">Vendedores registrados</div>
+                        </div>
+                        <div class="stat-card" style="animation-delay: 0.4s">
+                            <div class="text-4xl lg:text-5xl font-black text-orange-500">&lt;</div>
+                            <div class="text-4xl lg:text-5xl font-black text-orange-500">10seg</div>
+                            <div class="text-sm text-gray-600 mt-2">Tiempo de respuesta</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Content - Phone Mockup -->
+                <div class="relative">
+                    <div class="phone-mockup relative">
+                        <!-- Activity Card -->
+                        <div class="absolute top-0 left-0 bg-white rounded-2xl shadow-2xl p-6 max-w-xs z-10">
+                            <h3 class="text-xl font-bold mb-4">Actividad del Agente IA</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li class="flex items-center space-x-2">
+                                    <span class="w-2 h-2 bg-green-500 rounded-full pulse-animation"></span>
+                                    <span>Escuchando Live 🔊</span>
+                                </li>
+                                <li>• Mensajes recibidos: <span class="font-bold">48</span></li>
+                                <li>• Respuestas enviadas: <span class="font-bold">47</span></li>
+                                <li>• Ventas confirmadas: <span class="font-bold">12 ✅</span></li>
+                            </ul>
+                            <div class="mt-4 px-4 py-2 bg-black text-white text-center rounded-full text-sm font-medium">
+                                En tiempo real
+                            </div>
+                        </div>
+                        
+                        <!-- Results Panel -->
+                        <div class="absolute top-8 right-0 bg-white rounded-2xl shadow-2xl p-6 max-w-xs z-20">
+                            <h3 class="text-xl font-bold mb-3">Panel de resultados</h3>
+                            <ul class="space-y-1 text-sm">
+                                <li>• Ventas hoy: <span class="font-bold">Bs. 1,240</span></li>
+                                <li>• Nuevos clientes: <span class="font-bold">18</span></li>
+                                <li>• Productos más vendidos: <span class="text-xs">"Set cosmético", "Auriculares Pro"</span></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Conversations Card -->
+                        <div class="absolute bottom-0 right-0 bg-white rounded-2xl shadow-2xl p-6 max-w-sm z-10">
+                            <h3 class="text-xl font-bold mb-3">Conversaciones activas!</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li>• 💬 "¿Todavía tienes disponible el producto azul?"</li>
+                                <li>• 💬 TapTap: "Sí, te envío el qr de pago por WhatsApp 📱"</li>
+                                <li>• 💬 "Listo, acabo de pagar."</li>
+                                <li>• 💬 TapTap: "Perfecto, ya registré tu pedido"</li>
+                            </ul>
+                            <div class="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-bold transform -rotate-2">
+                                ¡IA respondiendo automáticamente
+                            </div>
+                        </div>
+                        
+                        <!-- Phone Image Placeholder -->
+                        <div class="relative mx-auto w-64 h-[500px] bg-gray-900 rounded-[3rem] shadow-2xl p-3 mt-32">
+                            <div class="w-full h-full bg-white rounded-[2.5rem] overflow-hidden">
+                                <div class="bg-gray-100 h-full flex items-center justify-center">
+                                    <img src="/placeholder.svg?height=500&width=250" alt="Phone Interface" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-center text-2xl font-bold text-gray-900 mb-12">Impulsados por:</h2>
+            <div class="flex flex-wrap justify-center items-center gap-12 lg:gap-20">
+                <img src="/placeholder.svg?height=60&width=200" alt="Google for Startups" class="h-12 opacity-70 hover:opacity-100 transition">
+                <img src="/placeholder.svg?height=60&width=200" alt="Aceleratec" class="h-12 opacity-70 hover:opacity-100 transition">
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-50 py-8 border-t">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-600">
+                Todos los derechos reservados, <span class="text-orange-500 font-bold">TapTap 2025</span>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Add scroll effect to navbar
+        let lastScroll = 0;
+        const nav = document.querySelector('nav');
+        
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                nav.classList.add('shadow-md');
+            } else {
+                nav.classList.remove('shadow-md');
+            }
+            
+            lastScroll = currentScroll;
+        });
+    </script>
+</body>
+</html>
