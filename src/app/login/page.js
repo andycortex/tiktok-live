@@ -125,7 +125,7 @@ const LoginPage = () => {
                             Recordarme
                           </label>
                         </div>
-                        <a href="#" className="text-sm text-purple-600 hover:text-purple-700 font-medium">
+                        <a href="/forgot-password" className="text-sm text-purple-600 hover:text-purple-700 font-medium">
                           ¿Olvidaste tu contraseña?
                         </a>
                       </div>

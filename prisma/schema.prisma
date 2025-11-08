@@ -18,6 +18,8 @@ model user {
   direccion String
   empresa   String
   tiktok    String
+  passwordResetToken   String?   @unique
+  passwordResetExpires DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
