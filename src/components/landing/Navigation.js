@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Link from 'next/link';
 
 export default function Navigation() {
   const navRef = useRef(null);
@@ -94,12 +95,12 @@ export default function Navigation() {
               
               {/* CTA Buttons */}
               <div className="hidden md:flex items-center space-x-4">
-                  <button className="px-6 py-2.5 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition">
+                  <Link href="/login" className="px-6 py-2.5 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition">
                       Mi cuenta
-                  </button>
-                  <button className="px-6 py-2.5 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition">
+                  </Link>
+                  <Link href="/register" className="px-6 py-2.5 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition">
                       Registrarse
-                  </button>
+                  </Link>
               </div>
               
               {/* Mobile Menu Button */}
@@ -120,7 +121,7 @@ export default function Navigation() {
               <a href="#" className="block text-gray-700">Panel Vendedor</a>
               <a href="#" className="block text-gray-700">Portal Empresa</a>
               <div className="pt-4 space-y-2">
-                  <button className="w-full px-6 py-2.5 bg-black text-white rounded-lg font-medium">Mi cuenta</button>
+                  <Link href="/login" className="w-full block text-center px-6 py-2.5 bg-black text-white rounded-lg font-medium">Mi cuenta</Link>
                   <button className="w-full px-6 py-2.5 bg-orange-500 text-white rounded-lg font-medium">Registrarse</button>
               </div>
           </div>

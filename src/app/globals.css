@@ -39,7 +39,7 @@ body {
 }
 
 .gradient-bg {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #F54A00 0%, #C53B00 100%);
 }
 
 .tiktok-gradient {
@@ -113,7 +113,7 @@ body {
 
 .loading-spinner {
     border: 3px solid #f3f3f3;
-    border-top: 3px solid #667eea;
+    border-top: 3px solid #F54A00;
     border-radius: 50%;
     width: 20px;
     height: 20px;
