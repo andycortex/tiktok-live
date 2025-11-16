@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const SCRAPER_SERVER_URL = process.env.SCRAPER_SERVER_URL || 'http://localhost:8080';
+const SCRAPER_SERVER_URL = process.env.SCRAPER_SERVER_URL
 
 export async function POST(req) {
   try {
@@ -12,7 +12,7 @@ export async function POST(req) {
       return NextResponse.json({ error: 'TikTok uniqueId is required' }, { status: 400 });
     }
 
-    const fetchUrl = `${SCRAPER_SERVER_URL}/connect`;
+    const fetchUrl = `${SCRAPER_SERVER_URL}/scrape/start`;
     const fetchOptions = {
       method: 'POST',
       headers: {
