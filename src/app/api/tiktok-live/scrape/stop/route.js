@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const SCRAPER_SERVER_URL = process.env.SCRAPER_SERVER_URL;
+const SCRAPER_SERVER_URL = process.env.SCRAPER_SERVER_URL || 'http://localhost:8080';
 
 export async function POST(req) {
   try {
@@ -13,7 +13,7 @@ export async function POST(req) {
     }
 
     console.log(`Next.js Disconnect API: Forwarding disconnect request for ${uniqueId} to scraper server`);
-    const response = await fetch(`${SCRAPER_SERVER_URL}/scrape/stop`, {
+    const response = await fetch(`${SCRAPER_SERVER_URL}/disconnect`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
