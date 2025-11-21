@@ -37,99 +37,82 @@ const LivePage = () => {
     }
   };
 
-  const handleConnect = async () => {
+const handleConnect = async () => {
     let input = uniqueId.trim();
+    if (!input) return alert("Ingresa un username o URL de TikTok");
 
-    if (!input) {
-      alert("Ingresa un username o URL de TikTok");
-      return;
-    }
-
-
-    if (input.startsWith("@")) {
-      input = input.slice(1);
-    }
+    if (input.startsWith("@")) input = input.slice(1);
 
     const urlMatch = input.match(/tiktok\.com\/@([^/?\s]+)/i);
-    if (urlMatch) {
-      input = urlMatch[1];
-    }
+    if (urlMatch) input = urlMatch[1];
 
-    const fallbackMatch = input.match(
-      /(?:tiktok\.com[^a-zA-Z0-9]*)([a-zA-Z0-9._]+)/i
-    );
-    if (fallbackMatch) {
-      input = fallbackMatch[1];
-    }
+    const fallbackMatch = input.match(/(?:tiktok\.com[^a-zA-Z0-9]*)([a-zA-Z0-9._]+)/i);
+    if (fallbackMatch) input = fallbackMatch[1];
 
     let cleanUniqueId = input.replace(/[^a-zA-Z0-9._]/g, "");
-
-    if (
-      !cleanUniqueId ||
-      cleanUniqueId.length < 1 ||
-      cleanUniqueId.length > 50
-    ) {
-      alert("Username inválido. Usa solo letras, números, _ y .");
-      return;
+    if (!cleanUniqueId || cleanUniqueId.length > 50) {
+      return console.log("Username inválido");
     }
 
     try {
-    const startRes = await fetch('/api/tiktok-live/scrape/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ uniqueId: cleanUniqueId }),
-    });
-
-    if (!startRes.ok) {
-      const err = await startRes.json();
-      alert(err.error.includes('vivo') ? `@${cleanUniqueId} no está en vivo` : err.error);
-      return;
-    }
-
-    setIsConnected(true);
-    setLiveComments([]);
-
-    // POLLING DIRECTO AL SCRAPER
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/comments?username=${cleanUniqueId}`);
-        if (!res.ok) return;
-
-        const data = await res.json();
-        setLiveComments(data.comments || []);
-      } catch (err) {
-        console.error('Error polling scraper:', err);
-      }
-    }, 2000);
-
-    
-
-  } catch (err) {
-    alert('Error de red');
-  }
-}
-  const handleDisconnect = async () => {
-    try {
-      // Close WebSocket connection first
-      
-
-      const response = await fetch("/api/tiktok-live/scrape/stop", {
+      const startRes = await fetch("/api/tiktok-live/scrape/connect", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ uniqueId }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uniqueId: cleanUniqueId })
+      });
+
+      if (!startRes.ok) {
+        const err = await startRes.json();
+        console.log(err.error.includes("vivo") ? `@${cleanUniqueId} no está en vivo` : err.error);
+        return;
+      }
+
+      setIsConnected(true);
+      setLiveComments([]);
+
+      // Limpiar intervalo anterior por si acaso
+      if (intervalRef.current) clearInterval(intervalRef.current);
+
+      // Polling cada 2 segundos
+      intervalRef.current = setInterval(async () => {
+        try {
+          const res = await fetch(`http://localhost:5000/comments?username=${cleanUniqueId}`);
+          if (!res.ok) return;
+          const data = await res.json();
+          setLiveComments(data.comments || []);
+        } catch (err) {
+          console.error("Error polling:", err);
+        }
+      }, 2000);
+    } catch (err) {
+     console.log("Error de red al conectar");
+    }
+  };
+
+const handleDisconnect = async () => {
+    if (!uniqueId) return;
+
+    try {
+      const response = await fetch("/api/tiktok-live/scrape/disconnect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uniqueId: uniqueId.trim() }),
       });
 
       if (response.ok) {
         setIsConnected(false);
-        console.log("Disconnected from TikTok Live");
+        setLiveComments([]);
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        console.log("Desconectado correctamente");
       } else {
-        const errorData = await response.json();
-        console.error("Failed to disconnect:", errorData.error);
+        const err = await response.json().catch(() => ({}));
+        console.log(err.error || "Error al desconectar");
       }
     } catch (error) {
-      console.error("Error disconnecting:", error);
+      console.error("Error de red al desconectar:", error);
     }
   };
 
