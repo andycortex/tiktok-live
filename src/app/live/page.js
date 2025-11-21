@@ -70,20 +70,23 @@ const handleConnect = async () => {
       setIsConnected(true);
       setLiveComments([]);
 
-      // Limpiar intervalo anterior por si acaso
-      if (intervalRef.current) clearInterval(intervalRef.current);
+if (intervalRef.current) clearInterval(intervalRef.current);
 
-      // Polling cada 2 segundos
-      intervalRef.current = setInterval(async () => {
-        try {
-          const res = await fetch(`http://localhost:5000/comments?username=${cleanUniqueId}`);
-          if (!res.ok) return;
-          const data = await res.json();
-          setLiveComments(data.comments || []);
-        } catch (err) {
-          console.error("Error polling:", err);
-        }
-      }, 2000);
+intervalRef.current = setInterval(async () => {
+  try {
+    const res = await fetch(`/api/tiktok-live/scrape/comments?username=${cleanUniqueId}`);
+    if (!res.ok) {
+      if (res.status === 404 || res.status === 400) {
+        setLiveComments([]);
+      }
+      return;
+    }
+    const data = await res.json();
+    setLiveComments(data.comments || []);
+  } catch (err) {
+    console.error("Error polling comments:", err);
+  }
+}, 2000);
     } catch (err) {
      console.log("Error de red al conectar");
     }
