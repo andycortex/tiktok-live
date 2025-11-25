@@ -5,6 +5,7 @@ const SCRAPER_SERVER_URL = process.env.SCRAPER_SERVER_URL;
 export async function POST(req) {
   try {
     const { uniqueId } = await req.json();
+    console.log("uniqueId",uniqueId)
     if (!uniqueId) {
       return NextResponse.json({ error: 'TikTok uniqueId is required' }, { status: 400 });
     }

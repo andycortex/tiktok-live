@@ -1,30 +1,41 @@
+// src/app/api/tiktok-live/scrape/stop/route.js
 import { NextResponse } from 'next/server';
 
-const SCRAPER_SERVER_URL = process.env.SCRAPER_SERVER_URL;
+const BACKEND_URL = process.env.SCRAPER_SERVER_URL || 'http://127.0.0.1:5000';
 
-export async function POST(req) {
+export async function POST(request) {
   try {
-    console.log('Next.js Disconnect API: Request received');
-    const { uniqueId } = await req.json();
+    const { uniqueId } = await request.json();
 
     if (!uniqueId) {
-      return NextResponse.json({ error: 'TikTok uniqueId is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'uniqueId es requerido' },
+        { status: 400 }
+      );
     }
 
-    const response = await fetch(`${SCRAPER_SERVER_URL}/scrape/disconnect`, {
+    const res = await fetch(`${BACKEND_URL}/scrape/disconnect`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ uniqueId }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      return NextResponse.json({ error: errorData.error }, { status: response.status });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: data.error || 'Error al desconectar del scraper' },
+        { status: res.status }
+      );
     }
 
-    const successData = await response.json();
-    return NextResponse.json(successData, { status: 200 });
+    return NextResponse.json(data);
+
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Error en proxy disconnect:', error);
+    return NextResponse.json(
+      { error: 'Error interno del servidor' },
+      { status: 500 }
+    );
   }
 }

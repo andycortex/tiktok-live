@@ -6,6 +6,7 @@ import LiveHeader from "@/components/LiveHeader";
 import VideoPlayer from "@/components/VideoPlayer";
 import Comments from "@/components/Comments";
 import { useUser } from "@/context/UserContext";
+import { extractTikTokUsername } from "@/utils/tiktokUsername";
 
 const LivePage = () => {
   const router = useRouter();
@@ -13,6 +14,7 @@ const LivePage = () => {
   const [uniqueId, setUniqueId] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [liveComments, setLiveComments] = useState([]);
+  const intervalRef = useRef(null);
 
   // Pre-fill uniqueId from user context once user data is loaded
   useEffect(() => {
@@ -37,69 +39,60 @@ const LivePage = () => {
     }
   };
 
-const handleConnect = async () => {
-    let input = uniqueId.trim();
-    if (!input) return alert("Ingresa un username o URL de TikTok");
-
-    if (input.startsWith("@")) input = input.slice(1);
-
-    const urlMatch = input.match(/tiktok\.com\/@([^/?\s]+)/i);
-    if (urlMatch) input = urlMatch[1];
-
-    const fallbackMatch = input.match(/(?:tiktok\.com[^a-zA-Z0-9]*)([a-zA-Z0-9._]+)/i);
-    if (fallbackMatch) input = fallbackMatch[1];
-
-    let cleanUniqueId = input.replace(/[^a-zA-Z0-9._]/g, "");
-    if (!cleanUniqueId || cleanUniqueId.length > 50) {
-      return console.log("Username inválido");
-    }
+  const handleConnect = async () => {
+    let input = extractTikTokUsername(uniqueId.trim());
 
     try {
       const startRes = await fetch("/api/tiktok-live/scrape/connect", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ uniqueId: cleanUniqueId })
+        body: JSON.stringify({ uniqueId: input }),
       });
 
       if (!startRes.ok) {
         const err = await startRes.json();
-        console.log(err.error.includes("vivo") ? `@${cleanUniqueId} no está en vivo` : err.error);
+        console.log(
+          err.error?.includes("vivo")
+            ? `@${input} no está en vivo`
+            : err.error || "Error al conectar"
+        );
         return;
       }
 
       setIsConnected(true);
       setLiveComments([]);
 
-if (intervalRef.current) clearInterval(intervalRef.current);
+      // Limpiar intervalo anterior
+      if (intervalRef.current) clearInterval(intervalRef.current);
 
-intervalRef.current = setInterval(async () => {
-  try {
-    const res = await fetch(`/api/tiktok-live/scrape/comments?username=${cleanUniqueId}`);
-    if (!res.ok) {
-      if (res.status === 404 || res.status === 400) {
-        setLiveComments([]);
-      }
-      return;
-    }
-    const data = await res.json();
-    setLiveComments(data.comments || []);
-  } catch (err) {
-    console.error("Error polling comments:", err);
-  }
-}, 2000);
+      // POLLING CORRECTO (con CORS permitido ya no hay error)
+      intervalRef.current = setInterval(async () => {
+        try {
+          const res = await fetch(`http://127.0.0.1:5000/scrape/user/${input}/comments`);
+
+          if (!res.ok) {
+            console.log("Aún no hay comentarios o live no activo");
+            setLiveComments([]);
+            return;
+          }
+
+          const data = await res.json();
+          setLiveComments(data.comments || []);
+        } catch (err) {
+          console.error("Error en polling:", err);
+        }
+      }, 2000);
     } catch (err) {
-     console.log("Error de red al conectar");
+      console.error("Error de red al conectar:", err);
     }
   };
-
-const handleDisconnect = async () => {
-    if (!uniqueId) return;
-
+  const handleDisconnect = async () => {
+    let input = extractTikTokUsername(uniqueId.trim());
     try {
       const response = await fetch("/api/tiktok-live/scrape/disconnect", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ uniqueId: uniqueId.trim() }),
+        body: JSON.stringify({ uniqueId: input }),
       });
 
       if (response.ok) {
@@ -111,14 +104,13 @@ const handleDisconnect = async () => {
         }
         console.log("Desconectado correctamente");
       } else {
-        const err = await response.json().catch(() => ({}));
+        const err = await response.json();
         console.log(err.error || "Error al desconectar");
       }
     } catch (error) {
-      console.error("Error de red al desconectar:", error);
+      console.error("Error de red:", error);
     }
   };
-
 
   // Conditional rendering for input and buttons
   const renderConnectionControls = () => {

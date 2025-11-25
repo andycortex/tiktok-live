@@ -1,50 +1,36 @@
-import { NextResponse } from "next/server";
-
-const BACKEND_URL = process.env.BACKEND_URL;
+const BACKEND_URL = process.env.BACKEND_URL || "http://127.0.0.1:5000";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const username = searchParams.get("username");
+  console.log(username)
 
   if (!username) {
-    return NextResponse.json(
-      { error: "Falta el parámetro 'username'" },
-      { status: 400 }
-    );
+    return Response.json({ error: "username requerido" }, { status: 400 });
   }
 
   try {
-    const response = await fetch(
-      `${BACKEND_URL}/scrape/comments?username=${encodeURIComponent(username)}`,
+    const res = await fetch(
+      `${BACKEND_URL}/scrape/user/${username}/comments?limit=200`,
       {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        next: { revalidate: 1 }
+        cache: "no-store", // siempre fresco
       }
     );
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      return NextResponse.json(
-        { error: errorText || "Live no encontrado o no activo" },
-        { status: response.status }
-      );
+    if (!res.ok) {
+      const error = await res.text();
+      console.error("Backend error:", error);
+      return Response.json({ comments: [] }, { status: res.status });
     }
 
-    const data = await response.json();
+    const data = await res.json();
 
-    return NextResponse.json({
-      username: data.username,
-      total: data.total,
+    return Response.json({
       comments: data.comments || [],
+      total: data.total || 0,
     });
   } catch (error) {
-    console.error("Error proxy /scrape/comments:", error);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
+    console.error("Proxy error:", error);
+    return Response.json({ comments: [] }, { status: 500 });
   }
 }
