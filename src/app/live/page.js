@@ -67,8 +67,9 @@ const LivePage = () => {
 
       // POLLING CORRECTO (con CORS permitido ya no hay error)
       intervalRef.current = setInterval(async () => {
+        console.log(input)
         try {
-          const res = await fetch(`http://127.0.0.1:5000/scrape/user/${input}/comments`);
+          const res = await fetch(`/api/tiktok-live/scrape/comments/${input}`);
 
           if (!res.ok) {
             console.log("Aún no hay comentarios o live no activo");
