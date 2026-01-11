@@ -87,10 +87,10 @@ export default function Navigation() {
               {/* Navigation Links */}
               <div className="hidden md:flex items-center space-x-8">
                   <a href="#" className="text-orange-500 font-medium hover:text-orange-600 transition">Inicio</a>
-                  <a href="#" className="text-gray-700 hover:text-orange-500 transition">Instrucciones</a>
-                  <a href="#" className="text-gray-700 hover:text-orange-500 transition">Catálogo</a>
-                  <a href="#" className="text-gray-700 hover:text-orange-500 transition">Panel Vendedor</a>
-                  <a href="#" className="text-gray-700 hover:text-orange-500 transition">Portal Empresa</a>
+                  <a href="#" className="text-gray-700 hover:text-orange-500 transition">Servicios</a>
+                  <a href="#" className="text-gray-700 hover:text-orange-500 transition">Nosotros</a>
+                  <a href="#" className="text-gray-700 hover:text-orange-500 transition">Blog</a>
+                  <a href="#" className="text-gray-700 hover:text-orange-500 transition">Contactanos</a>
               </div>
               
               {/* CTA Buttons */}

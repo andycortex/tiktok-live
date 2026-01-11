@@ -23,16 +23,15 @@ export default function Hero() {
                   {/* Stats */}
                   <div className="grid grid-cols-3 gap-6 pt-8">
                       <div className="stat-card">
-                          <div className="text-4xl lg:text-5xl font-black text-orange-500">150+</div>
+                          <div className="text-4xl lg:text-4xl font-black text-orange-500">150+</div>
                           <div className="text-sm text-gray-600 mt-2">Tiendas registrados</div>
                       </div>
                       <div className="stat-card" style={{animationDelay: '0.2s'}}>
-                          <div className="text-4xl lg:text-5xl font-black text-orange-500">50+</div>
+                          <div className="text-4xl lg:text-4xl font-black text-orange-500">50+</div>
                           <div className="text-sm text-gray-600 mt-2">Vendedores registrados</div>
                       </div>
                       <div className="stat-card" style={{animationDelay: '0.4s'}}>
-                          <div className="text-4xl lg:text-5xl font-black text-orange-500">&lt;</div>
-                          <div className="text-4xl lg:text-5xl font-black text-orange-500">10seg</div>
+                          <div className="text-4xl lg:text-4xl font-black text-orange-500"> &lt; 10seg</div>
                           <div className="text-sm text-gray-600 mt-2">Tiempo de respuesta</div>
                       </div>
                   </div>
