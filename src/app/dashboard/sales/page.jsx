@@ -4,6 +4,9 @@ import React from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { StatsCard } from "@/components/sellers/StatsCard";
 import { SoldProductTable } from "@/components/sales/SoldProductTable";
+import Pagination from "@/components/ui/Pagination";
+import { Input } from "@/components/ui/Input";
+import { Search } from "lucide-react";
 
 const mockSales = [
   {
@@ -74,6 +77,23 @@ const mockSales = [
 ];
 
 export default function SalesPage() {
+  const [searchTerm, setSearchTerm] = React.useState("");
+
+  const filteredSales = mockSales.filter(
+    (sale) =>
+      sale.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sale.buyerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sale.sellerName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const itemsPerPage = 5;
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const totalPages = Math.ceil(filteredSales.length / itemsPerPage);
+  const paginatedSales = filteredSales.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <DashboardLayout>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -111,11 +131,24 @@ export default function SalesPage() {
         />
       </div>
 
-      <div className="mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <h2 className="text-xl font-bold text-gray-900">Productos Vendidos</h2>
+        <Input
+          placeholder="Buscar ventas..."
+          icon={Search}
+          className="bg-white w-full sm:w-64"
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
-      <SoldProductTable sales={mockSales} />
+      <SoldProductTable sales={paginatedSales} />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        totalItems={filteredSales.length}
+        itemsPerPage={itemsPerPage}
+      />
     </DashboardLayout>
   );
 }

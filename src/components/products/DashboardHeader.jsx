@@ -4,7 +4,7 @@ import Button from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Search, FolderUp, Plus, Share2 } from "lucide-react";
 
-export const DashboardHeader = () => {
+export const DashboardHeader = ({ onSearch }) => {
   return (
     <div className="space-y-6 mb-6">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -40,6 +40,7 @@ export const DashboardHeader = () => {
             icon={Search}
             placeholder="Buscar productos..."
             className="bg-white"
+            onChange={(e) => onSearch && onSearch(e.target.value)}
           />
         </div>
         <div className="w-full lg:w-auto">

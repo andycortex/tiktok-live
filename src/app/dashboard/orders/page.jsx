@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { OrdersHeader } from "@/components/orders/OrdersHeader";
 import { OrderTable } from "@/components/orders/OrderTable";
+import Pagination from "@/components/ui/Pagination";
 import { FilterTabs } from "@/components/sellers/FilterTabs";
 import { Input } from "@/components/ui/Input";
 import { Search } from "lucide-react";
@@ -93,6 +94,19 @@ const mockOrders = [
     total: "Bs 623",
     status: "confirmado",
   },
+  {
+    id: "PED-007",
+    date: "24 Dic 2024, 14:20",
+    customerName: "Jorge Lima",
+    customerPhone: "+591 7789-0123",
+    products: [{ name: "Cámara Canon", quantity: "x1" }],
+    paymentPending: false,
+    sellerName: "Ana Flores",
+    location: "La Paz",
+    shippingCost: "Bs 35",
+    total: "Bs 2100",
+    status: "cancelado",
+  },
 ];
 
 const filters = [
@@ -106,6 +120,27 @@ const filters = [
 
 export default function OrdersPage() {
   const [activeFilter, setActiveFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredOrders = mockOrders.filter((order) => {
+    const matchesSearch =
+      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.products.some((p) =>
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+    if (activeFilter === "all") return matchesSearch;
+    return matchesSearch && order.status === activeFilter;
+  });
+
+  const itemsPerPage = 5;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  const paginatedOrders = filteredOrders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <DashboardLayout>
@@ -116,6 +151,8 @@ export default function OrdersPage() {
           icon={Search}
           placeholder="Buscar por cliente, producto o código..."
           className="bg-white border-0 shadow-sm"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
         <FilterTabs
           filters={filters}
@@ -124,7 +161,14 @@ export default function OrdersPage() {
         />
       </div>
 
-      <OrderTable orders={mockOrders} />
+      <OrderTable orders={paginatedOrders} />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        totalItems={filteredOrders.length}
+        itemsPerPage={itemsPerPage}
+      />
     </DashboardLayout>
   );
 }

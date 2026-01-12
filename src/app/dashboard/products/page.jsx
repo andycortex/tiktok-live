@@ -4,6 +4,7 @@ import React from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { DashboardHeader } from "@/components/products/DashboardHeader";
 import { ProductTable } from "@/components/products/ProductTable";
+import Pagination from "@/components/ui/Pagination";
 
 const mockProducts = [
   {
@@ -59,10 +60,33 @@ const mockProducts = [
 ];
 
 export default function ProductsPage() {
+  const [searchTerm, setSearchTerm] = React.useState("");
+
+  const filteredProducts = mockProducts.filter(
+    (product) =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.code.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const itemsPerPage = 5;
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <DashboardLayout>
-      <DashboardHeader />
-      <ProductTable products={mockProducts} />
+      <DashboardHeader onSearch={setSearchTerm} />
+      <ProductTable products={paginatedProducts} />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        totalItems={filteredProducts.length}
+        itemsPerPage={itemsPerPage}
+      />
     </DashboardLayout>
   );
 }

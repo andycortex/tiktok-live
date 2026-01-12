@@ -6,7 +6,9 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import Button from "@/components/ui/Button";
 import { InfoBanner } from "@/components/logistics/InfoBanner";
 import { ZoneCard } from "@/components/logistics/ZoneCard";
-import { Plus, Map, Building2, Mountain } from "lucide-react";
+import { Input } from "@/components/ui/Input";
+import Pagination from "@/components/ui/Pagination";
+import { Plus, Map, Building2, Mountain, Search } from "lucide-react";
 
 const mockZones = [
   {
@@ -51,6 +53,22 @@ const mockZones = [
 ];
 
 export default function LogisticsPage() {
+  const [searchTerm, setSearchTerm] = React.useState("");
+
+  const filteredZones = mockZones.filter(
+    (zone) =>
+      zone.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      zone.region.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const itemsPerPage = 6; // Grid view, slightly different count logic usually
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const totalPages = Math.ceil(filteredZones.length / itemsPerPage);
+  const paginatedZones = filteredZones.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <DashboardLayout>
       <div className="mb-8">
@@ -80,11 +98,28 @@ export default function LogisticsPage() {
         </Link>
       </div>
 
+      <div className="mb-6 max-w-md">
+        <Input
+          placeholder="Buscar zona..."
+          icon={Search}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="bg-white"
+        />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {mockZones.map((zone) => (
+        {paginatedZones.map((zone) => (
           <ZoneCard key={zone.id} zone={zone} />
         ))}
       </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        totalItems={filteredZones.length}
+        itemsPerPage={itemsPerPage}
+        className="mt-8 border-t-0 px-0"
+      />
     </DashboardLayout>
   );
 }

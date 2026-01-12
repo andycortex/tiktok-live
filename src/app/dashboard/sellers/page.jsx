@@ -5,6 +5,7 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import { SellersHeader } from "@/components/sellers/SellersHeader";
 import { FilterTabs } from "@/components/sellers/FilterTabs";
 import { VendorTable } from "@/components/sellers/VendorTable";
+import Pagination from "@/components/ui/Pagination";
 import { Input } from "@/components/ui/Input";
 import { Search } from "lucide-react";
 
@@ -41,7 +42,7 @@ const mockVendors = [
     color: "bg-emerald-600",
     name: "Ana Flores",
     joinDate: "Mar 2024",
-    status: "active",
+    status: "inactive",
     sales: 22,
     totalAmount: "Bs 3150",
     commission: "Bs 473",
@@ -59,6 +60,25 @@ const filters = [
 
 export default function SellersPage() {
   const [activeFilter, setActiveFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredVendors = mockVendors.filter((vendor) => {
+    const matchesSearch =
+      vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vendor.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (activeFilter === "all") return matchesSearch;
+    if (activeFilter === "top") return matchesSearch && vendor.sales > 20; // Mock logic
+    return matchesSearch && vendor.status === activeFilter;
+  });
+
+  const itemsPerPage = 5;
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(filteredVendors.length / itemsPerPage);
+  const paginatedVendors = filteredVendors.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <DashboardLayout>
@@ -72,6 +92,8 @@ export default function SellersPage() {
             placeholder="Buscar vendedores..."
             className="bg-gray-50 border-0 ring-0 focus:ring-0" // Simulating the clean look in image
             containerClassName="mb-2"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
           <FilterTabs
             filters={filters}
@@ -81,7 +103,14 @@ export default function SellersPage() {
         </div>
       </div>
 
-      <VendorTable vendors={mockVendors} />
+      <VendorTable vendors={paginatedVendors} />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        totalItems={filteredVendors.length}
+        itemsPerPage={itemsPerPage}
+      />
     </DashboardLayout>
   );
 }
