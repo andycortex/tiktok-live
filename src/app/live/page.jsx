@@ -128,15 +128,12 @@ const LivePage = () => {
                   Usuario de TikTok
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-gray-400 font-medium">
-                    @
-                  </span>
                   <input
                     type="text"
                     value={uniqueId}
                     onChange={(e) => setUniqueId(e.target.value)}
                     placeholder="usuario"
-                    className="w-full pl-8 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                    className="w-full pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
                   />
                 </div>
               </div>
@@ -185,7 +182,7 @@ const LivePage = () => {
           <div className="flex-1 bg-gray-900 relative flex items-center justify-center p-4">
             {/* This container ensures the video scales nicely but doesn't overflow */}
             <div className="h-full w-full max-w-sm aspect-[9/16] bg-black rounded-lg overflow-hidden shadow-2xl ring-1 ring-white/10">
-              <VideoPlayer />
+              <VideoPlayer username={uniqueId} />
             </div>
 
             {/* Overlay Information (Optional) */}

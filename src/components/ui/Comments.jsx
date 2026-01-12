@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { MessageSquare, Pause, Play, Settings } from "lucide-react";
+import { MessageSquare, Pause, Settings } from "lucide-react";
+import { Avatar } from "./Avatar";
 
 const Comments = ({ comments }) => {
   const commentsEndRef = useRef(null);
@@ -37,29 +38,45 @@ const Comments = ({ comments }) => {
             <p className="text-sm">Esperando comentarios...</p>
           </div>
         ) : (
-          comments.map((comment, index) => (
-            <div
-              key={index}
-              className="flex gap-3 group animate-in fade-in slide-in-from-bottom-2 duration-300"
-            >
-              <img
-                src={comment.avatar}
-                alt={comment.user.nickname}
-                className="w-8 h-8 rounded-full object-cover ring-2 ring-gray-50 flex-shrink-0"
-              />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-sm font-bold text-gray-900 truncate">
-                    {comment.user.nickname}
-                  </span>
-                  <span className="text-xs text-gray-400">12:45</span>
+          comments.map((comment, index) => {
+            // The API returns a flat structure: { user: string, name: string, comment: string, timestamp: string }
+            // or sometimes nested. Let's handle both just in case, prioritizing the flat structure seen in logs.
+            const displayName =
+              comment.name ||
+              comment.user?.nickname ||
+              comment.user ||
+              "Usuario";
+            const initials = displayName.substring(0, 2).toUpperCase();
+
+            // Avatar might not be in the flat response provided, so we rely on initials
+            const avatarUrl = comment.avatar || comment.user?.avatarThumb || "";
+
+            return (
+              <div
+                key={index}
+                className="flex gap-3 group animate-in fade-in slide-in-from-bottom-2 duration-300"
+              >
+                <Avatar
+                  src={avatarUrl}
+                  alt={displayName}
+                  initials={initials}
+                  size="sm"
+                  className="flex-shrink-0 ring-2 ring-gray-50"
+                  shape="circle"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-sm font-bold text-gray-900 truncate">
+                      {displayName}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed break-words">
+                    {comment.comment}
+                  </p>
                 </div>
-                <p className="text-sm text-gray-700 leading-relaxed break-words">
-                  {comment.comment}
-                </p>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
         <div ref={commentsEndRef} />
       </div>

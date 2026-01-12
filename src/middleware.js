@@ -2,12 +2,9 @@ import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 export async function middleware(request) {
-  console.log("Middleware executed");
   const { pathname } = request.nextUrl;
 
   const token = request.cookies.get("token")?.value;
-  console.log("Token from cookie:", token);
-  console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
   const isProtectedRoute =
     pathname.startsWith("/dashboard") || pathname === "/live";

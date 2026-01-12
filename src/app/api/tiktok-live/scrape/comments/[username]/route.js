@@ -19,7 +19,6 @@ export async function GET(request, { params }) {
 
     const data = await backendResponse.json();
     return Response.json(data);
-
   } catch (error) {
     return Response.json(
       { error: "Backend no está corriendo", username },
