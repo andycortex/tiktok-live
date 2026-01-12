@@ -10,6 +10,7 @@ import {
   TrendingUp,
   ShoppingCart,
   Truck,
+  Tv,
   X,
   LogOut,
 } from "lucide-react";
@@ -21,6 +22,7 @@ const menuItems = [
   { href: "/dashboard/sales", label: "Ventas", icon: TrendingUp },
   { href: "/dashboard/orders", label: "Pedidos", icon: ShoppingCart },
   { href: "/dashboard/logistics", label: "Logística", icon: Truck },
+  { href: "/live", label: "Emitir Live", icon: Tv },
 ];
 
 export const Sidebar = ({ isOpen, onClose }) => {

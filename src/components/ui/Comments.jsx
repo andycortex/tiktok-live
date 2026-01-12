@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react'; // Import useRef
+import { useEffect, useRef } from "react";
+import { MessageSquare, Pause, Play, Settings } from "lucide-react";
 
-const Comments = ({ comments }) => { // Accept comments prop
-  
-  const commentsEndRef = useRef(null); // Ref for auto-scrolling
+const Comments = ({ comments }) => {
+  const commentsEndRef = useRef(null);
 
   // Auto-scroll to the latest comment
   useEffect(() => {
@@ -12,38 +12,63 @@ const Comments = ({ comments }) => { // Accept comments prop
   }, [comments]);
 
   return (
-    <aside className="w-96 ml-4 flex flex-col">
-      <div className="bg-white rounded-t-xl p-4 border-b border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between">
-          <h2 className="font-bold text-lg flex items-center gap-2 text-gray-900">
-            <i className="fas fa-comments"></i>
-            Comentarios
-          </h2>
-          <div className="flex items-center gap-2">
-            <button className="text-gray-500 hover:text-gray-900 transition-colors">
-              <i className="fas fa-cog"></i>
-            </button>
-            <button id="pauseComments" className="text-gray-500 hover:text-gray-900 transition-colors">
-              <i className="fas fa-pause"></i>
-            </button>
-          </div>
+    <aside className="w-80 lg:w-96 flex flex-col bg-white border-l border-gray-100 h-full">
+      {/* Header */}
+      <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white">
+        <div className="flex items-center gap-2">
+          <MessageSquare size={18} className="text-gray-500" />
+          <h3 className="font-semibold text-gray-900">Chat en vivo</h3>
+        </div>
+        <div className="flex items-center gap-1">
+          <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-md transition-colors">
+            <Pause size={16} />
+          </button>
+          <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-md transition-colors">
+            <Settings size={16} />
+          </button>
         </div>
       </div>
-      <div id="commentsContainer" className="flex-1 bg-white overflow-y-auto scrollbar-hide p-4 space-y-3 shadow-inner">
+
+      {/* Chat Area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white/50 scroll-smooth">
         {comments.length === 0 ? (
-          <p className="text-gray-500 text-sm text-center">No comments yet. Connect to a live stream!</p>
+          <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-2">
+            <MessageSquare size={32} className="opacity-20" />
+            <p className="text-sm">Esperando comentarios...</p>
+          </div>
         ) : (
           comments.map((comment, index) => (
-            <div key={index} className="flex items-start gap-3 comment-enter">
-              <img src={comment.avatar} alt={comment.user} className="w-8 h-8 rounded-full" />
-              <div>
-                <p className="text-sm font-semibold">{comment.user.nickname}</p>
-                <p className="text-sm">{comment.comment}</p>
+            <div
+              key={index}
+              className="flex gap-3 group animate-in fade-in slide-in-from-bottom-2 duration-300"
+            >
+              <img
+                src={comment.avatar}
+                alt={comment.user.nickname}
+                className="w-8 h-8 rounded-full object-cover ring-2 ring-gray-50 flex-shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-sm font-bold text-gray-900 truncate">
+                    {comment.user.nickname}
+                  </span>
+                  <span className="text-xs text-gray-400">12:45</span>
+                </div>
+                <p className="text-sm text-gray-700 leading-relaxed break-words">
+                  {comment.comment}
+                </p>
               </div>
             </div>
           ))
         )}
-        <div ref={commentsEndRef} /> {/* Element to scroll to */}
+        <div ref={commentsEndRef} />
+      </div>
+
+      {/* Input Placeholder (simulated) */}
+      <div className="p-4 border-t border-gray-100 bg-gray-50">
+        <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-400 italic">
+          El chat es de solo lectura...
+        </div>
       </div>
     </aside>
   );
