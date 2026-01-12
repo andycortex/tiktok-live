@@ -133,7 +133,7 @@ const LivePage = () => {
                     value={uniqueId}
                     onChange={(e) => setUniqueId(e.target.value)}
                     placeholder="usuario"
-                    className="w-full pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                    className="w-full p-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
                   />
                 </div>
               </div>
