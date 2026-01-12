@@ -5,6 +5,7 @@ export default function Button({
   className = "",
   variant = "primary",
   size = "md",
+  fullWidth,
   icon: Icon,
   isLoading,
   ...props
@@ -30,10 +31,11 @@ export default function Button({
 
   const variantStyles = variants[variant] || variants.primary;
   const sizeStyles = sizes[size] || sizes.md;
+  const widthStyles = fullWidth ? "w-full" : "";
 
   return (
     <button
-      className={`${baseStyles} ${variantStyles} ${sizeStyles} ${className}`}
+      className={`${baseStyles} ${variantStyles} ${sizeStyles} ${widthStyles} ${className}`}
       {...props}
     >
       {isLoading ? (

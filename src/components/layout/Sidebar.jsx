@@ -2,9 +2,9 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 import {
-  LayoutDashboard,
   Package,
   Users,
   TrendingUp,
@@ -27,6 +27,25 @@ const menuItems = [
 
 export const Sidebar = ({ isOpen, onClose }) => {
   const pathname = usePathname();
+  const router = useRouter();
+  const { setUser } = useUser();
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/logout", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        setUser(null);
+        router.push("/login"); // Redirect to login page
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-white border-r border-gray-100">
@@ -68,6 +87,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
           variant="ghost"
           className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
           icon={LogOut}
+          onClick={handleLogout}
         >
           Cerrar Sesión
         </Button>

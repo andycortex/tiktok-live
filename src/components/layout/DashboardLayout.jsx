@@ -5,9 +5,15 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Sidebar } from "./Sidebar";
 import { Menu } from "lucide-react";
 import Button from "@/components/ui/Button";
+import { useUser } from "@/context/UserContext";
 
 export default function DashboardLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { user } = useUser();
+
+  const userInitials = user?.nombre
+    ? user.nombre.substring(0, 2).toUpperCase()
+    : "U";
 
   return (
     <div className="min-h-screen bg-[#F8F9FA]">
@@ -31,11 +37,16 @@ export default function DashboardLayout({ children }) {
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
               <div className="text-sm font-semibold text-gray-900">
-                Mi Tienda
+                {user?.nombre || "Usuario"}
               </div>
-              <div className="text-xs text-gray-500">admin@mitienda.com</div>
+              <div className="text-xs text-gray-500">
+                {user?.email || "Cargando..."}
+              </div>
             </div>
-            <Avatar initials="MT" className="bg-orange-500 text-white" />
+            <Avatar
+              initials={userInitials}
+              className="bg-orange-500 text-white"
+            />
           </div>
         </header>
 
