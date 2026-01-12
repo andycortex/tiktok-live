@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Button from "@/components/ui/Button";
 import { InfoBanner } from "@/components/logistics/InfoBanner";
@@ -72,9 +73,11 @@ export default function LogisticsPage() {
             Lugares donde realizas entregas
           </p>
         </div>
-        <Button variant="primary" icon={Plus}>
-          Nueva Zona
-        </Button>
+        <Link href="/dashboard/logistics/new">
+          <Button variant="primary" icon={Plus}>
+            Nueva Zona
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

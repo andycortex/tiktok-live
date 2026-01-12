@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import Button from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Search, FolderUp, Plus, Share2 } from "lucide-react";
@@ -21,13 +22,15 @@ export const DashboardHeader = () => {
           >
             Compartir
           </Button>
-          <Button
-            variant="primary"
-            icon={Plus}
-            className="justify-center sm:justify-start"
-          >
-            Nuevo Producto
-          </Button>
+          <Link href="/dashboard/products/new">
+            <Button
+              variant="primary"
+              icon={Plus}
+              className="justify-center sm:justify-start"
+            >
+              Nuevo Producto
+            </Button>
+          </Link>
         </div>
       </div>
 

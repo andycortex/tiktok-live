@@ -1,5 +1,8 @@
 import React from "react";
 import { StatsCard } from "../sellers/StatsCard";
+import Button from "../ui/Button";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 
 export const OrdersHeader = () => {
   return (
@@ -9,6 +12,13 @@ export const OrdersHeader = () => {
         <p className="text-gray-500 mt-1">
           Gestiona todos tus pedidos confirmados
         </p>
+      </div>
+      <div>
+        <Link href="/dashboard/orders/new">
+          <Button variant="primary" icon={Plus}>
+            Nuevo Pedido
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

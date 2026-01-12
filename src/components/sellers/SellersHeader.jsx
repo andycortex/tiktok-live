@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import Button from "../ui/Button";
 import { StatsCard } from "./StatsCard";
 import { Plus } from "lucide-react";
@@ -12,13 +13,15 @@ export const SellersHeader = () => {
           <p className="text-gray-500 mt-1">Gestiona tu equipo de ventas</p>
         </div>
         <div>
-          <Button
-            variant="primary"
-            icon={Plus}
-            className="w-full sm:w-auto justify-center"
-          >
-            Asignar Vendedor
-          </Button>
+          <Link href="/dashboard/sellers/new">
+            <Button
+              variant="primary"
+              icon={Plus}
+              className="w-full sm:w-auto justify-center"
+            >
+              Asignar Vendedor
+            </Button>
+          </Link>
         </div>
       </div>
 
