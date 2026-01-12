@@ -1,28 +1,28 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Header from '@/components/Header';
-import Input from '@/components/Input';
-import Button from '@/components/Button';
-import AuthLayout from '@/components/AuthLayout';
+import { useState } from "react";
+import Header from "@/components/ui/Header";
+import Input from "@/components/ui/Input_login";
+import Button from "@/components/ui/Button";
+import AuthLayout from "@/components/ui/AuthLayout";
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
-    setError('');
+    setMessage("");
+    setError("");
 
     try {
-      const res = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
       });
@@ -30,7 +30,7 @@ export default function ForgotPasswordPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || 'Something went wrong');
+        throw new Error(data.message || "Something went wrong");
       }
 
       setMessage(data.message);
@@ -43,7 +43,11 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <Header secondaryText="Remember your password?" ctaText="Login" ctaLink="/login" />
+      <Header
+        secondaryText="Remember your password?"
+        ctaText="Login"
+        ctaLink="/login"
+      />
       <AuthLayout
         title="Forgot Your Password?"
         description="Enter your email and we'll send you a link to get back into your account."
@@ -54,17 +58,17 @@ export default function ForgotPasswordPage() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Input 
-              id="email" 
-              label="Email" 
-              type="email" 
-              required 
-              placeholder="you@example.com" 
-              icon="fas fa-envelope" 
+            <Input
+              id="email"
+              label="Email"
+              type="email"
+              required
+              placeholder="you@example.com"
+              icon="fas fa-envelope"
               value={email}
-              onStateChange={setEmail} 
+              onStateChange={setEmail}
             />
-            
+
             <Button type="submit" fullWidth disabled={loading}>
               {loading ? (
                 <>
@@ -78,7 +82,9 @@ export default function ForgotPasswordPage() {
                 </>
               )}
             </Button>
-            {error && <p className="text-red-500 text-sm mt-4">Error: {error}</p>}
+            {error && (
+              <p className="text-red-500 text-sm mt-4">Error: {error}</p>
+            )}
           </form>
         )}
       </AuthLayout>

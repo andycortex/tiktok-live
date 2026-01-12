@@ -2,7 +2,7 @@
 
 import React from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Button } from "@/components/ui/Button";
+import Button from "@/components/ui/Button";
 import { InfoBanner } from "@/components/logistics/InfoBanner";
 import { ZoneCard } from "@/components/logistics/ZoneCard";
 import { Plus, Map, Building2, Mountain } from "lucide-react";

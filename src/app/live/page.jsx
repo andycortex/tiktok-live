@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import LiveHeader from "@/components/LiveHeader";
-import VideoPlayer from "@/components/VideoPlayer";
-import Comments from "@/components/Comments";
+import LiveHeader from "@/components/ui/LiveHeader";
+import VideoPlayer from "@/components/ui/VideoPlayer";
+import Comments from "@/components/ui/Comments";
 import { useUser } from "@/context/UserContext";
 import { extractTikTokUsername } from "@/utils/tiktokUsername";
 
@@ -67,7 +67,7 @@ const LivePage = () => {
 
       // POLLING CORRECTO (con CORS permitido ya no hay error)
       intervalRef.current = setInterval(async () => {
-        console.log(input)
+        console.log(input);
         try {
           const res = await fetch(`/api/tiktok-live/scrape/comments/${input}`);
 

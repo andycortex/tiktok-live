@@ -1,28 +1,28 @@
-'use client';
+"use client";
 
-import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import Header from '@/components/Header';
-import Input from '@/components/Input';
-import Button from '@/components/Button';
-import AuthLayout from '@/components/AuthLayout';
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import Header from "@/components/ui/Header";
+import Input from "@/components/ui/Input_login";
+import Button from "@/components/ui/Button";
+import AuthLayout from "@/components/ui/AuthLayout";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
-  const [token, setToken] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [token, setToken] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const urlToken = searchParams.get('token');
+    const urlToken = searchParams.get("token");
     if (urlToken) {
       setToken(urlToken);
     } else {
-      setError('No reset token found. Please request a new password reset.');
+      setError("No reset token found. Please request a new password reset.");
     }
   }, [searchParams]);
 
@@ -30,23 +30,23 @@ function ResetPasswordForm() {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+      setError("Passwords do not match.");
       return;
     }
     if (!token) {
-      setError('Invalid or missing reset token.');
+      setError("Invalid or missing reset token.");
       return;
     }
 
     setLoading(true);
-    setMessage('');
-    setError('');
+    setMessage("");
+    setError("");
 
     try {
-      const res = await fetch('/api/auth/reset-password', {
-        method: 'POST',
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ token, password }),
       });
@@ -54,7 +54,7 @@ function ResetPasswordForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || 'Something went wrong');
+        throw new Error(data.message || "Something went wrong");
       }
 
       setMessage(data.message);
@@ -73,7 +73,10 @@ function ResetPasswordForm() {
       {message ? (
         <div className="text-center">
           <p className="text-green-600">{message}</p>
-          <Link href="/login" className="mt-4 inline-block text-purple-600 hover:text-purple-700 font-medium">
+          <Link
+            href="/login"
+            className="mt-4 inline-block text-purple-600 hover:text-purple-700 font-medium"
+          >
             Proceed to Login
           </Link>
         </div>
@@ -120,8 +123,18 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <div className="bg-gray-50 min-h-screen">
-      <Header secondaryText="Remember your password?" ctaText="Login" ctaLink="/login" />
-      <Suspense fallback={<div className="flex justify-center items-center min-h-screen">Loading...</div>}>
+      <Header
+        secondaryText="Remember your password?"
+        ctaText="Login"
+        ctaLink="/login"
+      />
+      <Suspense
+        fallback={
+          <div className="flex justify-center items-center min-h-screen">
+            Loading...
+          </div>
+        }
+      >
         <ResetPasswordForm />
       </Suspense>
     </div>

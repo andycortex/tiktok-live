@@ -1,6 +1,6 @@
 import React from "react";
 import { Badge } from "../ui/Badge";
-import { Button } from "../ui/Button";
+import Button from "../ui/Button";
 import { Checkbox } from "../ui/Checkbox";
 import { Avatar } from "../ui/Avatar";
 import { Pencil, Download, Trash2, Lock, Globe } from "lucide-react";

@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "../ui/Button";
+import Button from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Search, FolderUp, Plus, Share2 } from "lucide-react";
 

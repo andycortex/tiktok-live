@@ -1,7 +1,12 @@
-import Image from 'next/image';
-import Card from '@/components/Card';
+import Image from "next/image";
+import Card from "@/components/ui/Card";
 
-export default function AuthLayout({ children, title, description, sidePanelContent }) {
+export default function AuthLayout({
+  children,
+  title,
+  description,
+  sidePanelContent,
+}) {
   const defaultSidePanelContent = (
     <>
       <div className="mb-8">
@@ -10,7 +15,8 @@ export default function AuthLayout({ children, title, description, sidePanelCont
         </div>
         <h2 className="text-3xl font-bold mb-4">Account Security</h2>
         <p className="text-white/90 mb-6">
-          Keep your account secure. Follow the steps to recover access to your account quickly and safely.
+          Keep your account secure. Follow the steps to recover access to your
+          account quickly and safely.
         </p>
       </div>
       <div className="space-y-4">
@@ -44,7 +50,9 @@ export default function AuthLayout({ children, title, description, sidePanelCont
             <div className="p-12 slide-in-right">
               <div className="max-w-sm mx-auto">
                 <div className="text-center mb-8">
-                  <h1 className="text-2xl font-bold text-gray-900 mb-2">{title}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                    {title}
+                  </h1>
                   <p className="text-gray-600 text-sm">{description}</p>
                 </div>
                 {children}
