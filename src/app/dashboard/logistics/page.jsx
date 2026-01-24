@@ -9,56 +9,63 @@ import { ZoneCard } from "@/components/logistics/ZoneCard";
 import { Input } from "@/components/ui/Input";
 import Pagination from "@/components/ui/Pagination";
 import { Plus, Map, Building2, Mountain, Search } from "lucide-react";
-
-const mockZones = [
-  {
-    id: "1",
-    name: "Santa Cruz Centro",
-    region: "Santa Cruz",
-    price: "Bs 15",
-    icon: <Map className="h-6 w-6 text-blue-500" />,
-    iconBg: "bg-blue-50",
-    instructions:
-      "Llamar 15 minutos antes de llegar. Entregar en portería o directamente al comprador.",
-    schedule: "Lunes a Sábado: 9:00 - 18:00",
-    deliveryTime: "Entrega el mismo día",
-    coverage: "Planes 1, 2, 3 y 4to anillo",
-  },
-  {
-    id: "2",
-    name: "Cochabamba",
-    region: "Cochabamba",
-    price: "Bs 25",
-    icon: <Building2 className="h-6 w-6 text-emerald-500" />,
-    iconBg: "bg-emerald-50",
-    instructions:
-      "Coordinar con el comprador el día anterior. Envío por agencia de transporte.",
-    schedule: "Martes y Jueves: 14:00 - 17:00",
-    deliveryTime: "2-3 días hábiles",
-    coverage: "Zona central y norte",
-  },
-  {
-    id: "3",
-    name: "La Paz",
-    region: "La Paz",
-    price: "Bs 35",
-    icon: <Mountain className="h-6 w-6 text-purple-500" />,
-    iconBg: "bg-purple-50",
-    instructions:
-      "Envío por agencia de encomiendas. El comprador retira en oficina de la agencia.",
-    schedule: "Lunes a Viernes: Todo el día",
-    deliveryTime: "3-5 días hábiles",
-    coverage: "Ciudad de La Paz y El Alto",
-  },
-];
+import Modal from "@/components/ui/Modal";
 
 export default function LogisticsPage() {
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [zones, setZones] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
+  const [zoneToDelete, setZoneToDelete] = React.useState(null);
 
-  const filteredZones = mockZones.filter(
+  const fetchZones = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/zones");
+      if (response.ok) {
+        const data = await response.json();
+        setZones(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch zones:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchZones();
+  }, []);
+
+  const confirmDelete = (id) => {
+    setZoneToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!zoneToDelete) return;
+
+    try {
+      const response = await fetch(`/api/zones/${zoneToDelete}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        fetchZones();
+        setDeleteModalOpen(false);
+        setZoneToDelete(null);
+      } else {
+        alert("Error al eliminar la zona");
+      }
+    } catch (error) {
+      console.error("Error deleting zone:", error);
+    }
+  };
+
+  const filteredZones = zones.filter(
     (zone) =>
       zone.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      zone.region.toLowerCase().includes(searchTerm.toLowerCase())
+      zone.region.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const itemsPerPage = 6; // Grid view, slightly different count logic usually
@@ -66,7 +73,7 @@ export default function LogisticsPage() {
   const totalPages = Math.ceil(filteredZones.length / itemsPerPage);
   const paginatedZones = filteredZones.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   return (
@@ -108,9 +115,19 @@ export default function LogisticsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {paginatedZones.map((zone) => (
-          <ZoneCard key={zone.id} zone={zone} />
-        ))}
+        {isLoading ? (
+          <div className="col-span-full h-64 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+          </div>
+        ) : filteredZones.length === 0 ? (
+          <div className="col-span-full py-12 text-center text-gray-500">
+            No hay zonas registradas.
+          </div>
+        ) : (
+          paginatedZones.map((zone) => (
+            <ZoneCard key={zone.id} zone={zone} onDelete={confirmDelete} />
+          ))
+        )}
       </div>
       <Pagination
         currentPage={currentPage}
@@ -120,6 +137,31 @@ export default function LogisticsPage() {
         itemsPerPage={itemsPerPage}
         className="mt-8 border-t-0 px-0"
       />
+
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        title="Eliminar Zona"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setDeleteModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="danger"
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={handleDelete}
+            >
+              Eliminar
+            </Button>
+          </>
+        }
+      >
+        <p className="text-gray-600">
+          ¿Estás seguro de que deseas eliminar esta zona? Esta acción no se
+          puede deshacer.
+        </p>
+      </Modal>
     </DashboardLayout>
   );
 }

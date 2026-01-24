@@ -4,8 +4,9 @@ import Button from "../ui/Button";
 import { Checkbox } from "../ui/Checkbox";
 import { Avatar } from "../ui/Avatar";
 import { Pencil, Download, Trash2, Lock, Globe } from "lucide-react";
+import Link from "next/link";
 
-export const ProductRow = ({ product, isSelected, onSelect }) => {
+export const ProductRow = ({ product, isSelected, onSelect, onDelete }) => {
   const getStatusBadge = (status) => {
     switch (status) {
       case "active":
@@ -78,24 +79,20 @@ export const ProductRow = ({ product, isSelected, onSelect }) => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-orange-400 hover:text-orange-500 hover:bg-orange-50"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-blue-400 hover:text-blue-500 hover:bg-blue-50"
-          >
-            <Download className="h-4 w-4" />
-          </Button>
+          <Link href={`/dashboard/products/${product.id}`}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-orange-400 hover:text-orange-500 hover:bg-orange-50"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          </Link>
           <Button
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50"
+            onClick={() => onDelete(product.id)}
           >
             <Trash2 className="h-4 w-4" />
           </Button>

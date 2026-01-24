@@ -8,17 +8,57 @@ import { Save } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function SellerForm() {
+export default function SellerForm({ initialData }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    firstName: initialData?.firstName || "",
+    lastName: initialData?.lastName || "",
+    email: initialData?.email || "",
+    phone: initialData?.phone || "",
+    status: initialData?.status || "active",
+    commission: initialData?.commission || "",
+  });
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleSelectChange = (id, value) => {
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    setError(null);
+
+    const url = initialData ? `/api/sellers/${initialData.id}` : "/api/sellers";
+    const method = initialData ? "PUT" : "POST";
+
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to save seller");
+      }
+
       router.push("/dashboard/sellers");
-    }, 1000);
+      router.refresh();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -36,18 +76,28 @@ export default function SellerForm() {
           </p>
         </div>
 
+        {error && (
+          <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg">
+            {error}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
           <Input
             id="firstName"
             label="Nombres"
             placeholder="Ej: Juan"
             required
+            value={formData.firstName}
+            onChange={handleChange}
           />
           <Input
             id="lastName"
             label="Apellidos"
             placeholder="Ej: Pérez"
             required
+            value={formData.lastName}
+            onChange={handleChange}
           />
 
           <Input
@@ -56,6 +106,8 @@ export default function SellerForm() {
             type="email"
             placeholder="juan@ejemplo.com"
             required
+            value={formData.email}
+            onChange={handleChange}
           />
           <Input
             id="phone"
@@ -63,6 +115,8 @@ export default function SellerForm() {
             type="tel"
             placeholder="+591 70000000"
             required
+            value={formData.phone}
+            onChange={handleChange}
           />
 
           <Select
@@ -73,12 +127,16 @@ export default function SellerForm() {
               { value: "inactive", label: "Inactivo" },
             ]}
             required
+            value={formData.status}
+            onChange={(e) => handleSelectChange("status", e.target.value)}
           />
           <Input
             id="commission"
             label="Comisión Base (%)"
             type="number"
             placeholder="Ej: 10"
+            value={formData.commission}
+            onChange={handleChange}
           />
         </div>
 

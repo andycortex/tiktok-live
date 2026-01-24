@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { ProductRow } from "./ProductRow";
 import { Checkbox } from "../ui/Checkbox";
 
-export const ProductTable = ({ products }) => {
+export const ProductTable = ({ products, isLoading, onDelete }) => {
   const [selectedIds, setSelectedIds] = useState(new Set());
 
   const handleSelectAll = (e) => {
@@ -25,6 +25,14 @@ export const ProductTable = ({ products }) => {
 
   const allSelected =
     products.length > 0 && selectedIds.size === products.length;
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-64 flex items-center justify-center bg-white rounded-xl shadow-sm ring-1 ring-gray-100">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-100">
@@ -84,14 +92,23 @@ export const ProductTable = ({ products }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-50">
-            {products.map((product) => (
-              <ProductRow
-                key={product.id}
-                product={product}
-                isSelected={selectedIds.has(product.id)}
-                onSelect={() => handleSelectOne(product.id)}
-              />
-            ))}
+            {products.length === 0 ? (
+              <tr>
+                <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
+                  No hay productos encontrados.
+                </td>
+              </tr>
+            ) : (
+              products.map((product) => (
+                <ProductRow
+                  key={product.id}
+                  product={product}
+                  isSelected={selectedIds.has(product.id)}
+                  onSelect={() => handleSelectOne(product.id)}
+                  onDelete={onDelete}
+                />
+              ))
+            )}
           </tbody>
         </table>
       </div>

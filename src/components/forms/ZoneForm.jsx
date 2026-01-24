@@ -8,17 +8,54 @@ import { Save } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function ZoneForm() {
+export default function ZoneForm({ initialData }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [formData, setFormData] = useState({
+    name: initialData?.name || "",
+    region: initialData?.region || "",
+    price: initialData?.price || "",
+    deliveryTime: initialData?.deliveryTime || "",
+    instructions: initialData?.instructions || "",
+    schedule: initialData?.schedule || "",
+    coverage: initialData?.coverage || "",
+  });
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    setError(null);
+
+    const url = initialData ? `/api/zones/${initialData.id}` : "/api/zones";
+    const method = initialData ? "PUT" : "POST";
+
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to save zone");
+      }
+
       router.push("/dashboard/logistics");
-    }, 1000);
+      router.refresh();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -36,18 +73,28 @@ export default function ZoneForm() {
           </p>
         </div>
 
+        {error && (
+          <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg">
+            {error}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
           <Input
             id="name"
             label="Nombre de la Zona"
             placeholder="Ej: Santa Cruz Centro"
             required
+            value={formData.name}
+            onChange={handleChange}
           />
           <Input
             id="region"
             label="Región / Ciudad"
             placeholder="Ej: Santa Cruz"
             required
+            value={formData.region}
+            onChange={handleChange}
           />
 
           <Input
@@ -56,23 +103,31 @@ export default function ZoneForm() {
             type="number"
             placeholder="15"
             required
+            value={formData.price}
+            onChange={handleChange}
           />
           <Input
             id="deliveryTime"
             label="Tiempo de Entrega"
             placeholder="Ej: Entrega el mismo día"
             required
+            value={formData.deliveryTime}
+            onChange={handleChange}
           />
 
           <TextArea
             id="instructions"
             label="Instrucciones"
             placeholder="Detalles de entrega..."
+            value={formData.instructions}
+            onChange={handleChange}
           />
           <TextArea
             id="schedule"
             label="Horario de Atención"
             placeholder="Ej: Lunes a Sábado: 9:00 - 18:00"
+            value={formData.schedule}
+            onChange={handleChange}
           />
 
           <TextArea
@@ -80,6 +135,8 @@ export default function ZoneForm() {
             label="Cobertura"
             placeholder="Ej: Planes 1 al 4to anillo"
             containerClassName="col-span-2"
+            value={formData.coverage}
+            onChange={handleChange}
           />
         </div>
 

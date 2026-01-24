@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { OrdersHeader } from "@/components/orders/OrdersHeader";
 import { OrderTable } from "@/components/orders/OrderTable";
@@ -8,106 +8,6 @@ import Pagination from "@/components/ui/Pagination";
 import { FilterTabs } from "@/components/sellers/FilterTabs";
 import { Input } from "@/components/ui/Input";
 import { Search } from "lucide-react";
-
-const mockOrders = [
-  {
-    id: "PED-001",
-    date: "26 Dic 2024, 10:30",
-    customerName: "Juan Pérez",
-    customerPhone: "+591 7123-4567",
-    products: [{ name: "iPhone 14 Pro", quantity: "x1" }],
-    paymentPending: true,
-    sellerName: "María López",
-    location: "Santa Cruz Centro",
-    shippingCost: "Bs 15",
-    total: "Bs 1314",
-    status: "pendiente",
-  },
-  {
-    id: "PED-002",
-    date: "26 Dic 2024, 09:15",
-    customerName: "María Silva",
-    customerPhone: "+591 7234-5678",
-    products: [
-      { name: "Polera Premium", quantity: "x2" },
-      { name: "Gorra Premium", quantity: "x1" },
-    ],
-    paymentPending: false,
-    sellerName: "Carlos Ramos",
-    location: "Cochabamba",
-    shippingCost: "Bs 25",
-    total: "Bs 140",
-    status: "confirmado",
-  },
-  {
-    id: "PED-003",
-    date: "25 Dic 2024, 18:45",
-    customerName: "Pedro Gómez",
-    customerPhone: "+591 7345-6789",
-    products: [{ name: "Zapatillas Nike", quantity: "x1" }],
-    paymentPending: false,
-    sellerName: "Ana Flores",
-    location: "La Paz",
-    shippingCost: "Bs 35",
-    total: "Bs 155",
-    status: "en_camino",
-  },
-  {
-    id: "PED-004",
-    date: "25 Dic 2024, 16:20",
-    customerName: "Laura Torres",
-    customerPhone: "+591 7456-7890",
-    products: [{ name: "AirPods Pro", quantity: "x1" }],
-    paymentPending: false,
-    sellerName: "Pedro Sánchez",
-    location: "Santa Cruz Centro",
-    shippingCost: "Bs 15",
-    total: "Bs 264",
-    status: "entregado",
-  },
-  {
-    id: "PED-005",
-    date: "26 Dic 2024, 11:00",
-    customerName: "Diego Castro",
-    customerPhone: "+591 7567-8901",
-    products: [{ name: "MacBook Air M2", quantity: "x1" }],
-    paymentPending: true,
-    sellerName: "Lucia Vargas",
-    location: "Tarija",
-    shippingCost: "Bs 30",
-    total: "Bs 1529",
-    status: "pendiente",
-  },
-  {
-    id: "PED-006",
-    date: "26 Dic 2024, 08:30",
-    customerName: "Sofía Medina",
-    customerPhone: "+591 7678-9012",
-    products: [
-      { name: "Apple Watch S8", quantity: "x1" },
-      { name: "Magic Keyboard", quantity: "x1" },
-    ],
-    paymentPending: false,
-    sellerName: "Roberto Cruz",
-    location: "Santa Cruz Centro",
-    shippingCost: "Bs 15",
-    total: "Bs 623",
-    status: "confirmado",
-  },
-  {
-    id: "PED-007",
-    date: "24 Dic 2024, 14:20",
-    customerName: "Jorge Lima",
-    customerPhone: "+591 7789-0123",
-    products: [{ name: "Cámara Canon", quantity: "x1" }],
-    paymentPending: false,
-    sellerName: "Ana Flores",
-    location: "La Paz",
-    shippingCost: "Bs 35",
-    total: "Bs 2100",
-    status: "cancelado",
-  },
-];
 
 const filters = [
   { id: "all", label: "Todos" },
@@ -121,13 +21,79 @@ const filters = [
 export default function OrdersPage() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [orders, setOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredOrders = mockOrders.filter((order) => {
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch("/api/orders");
+        if (response.ok) {
+          const data = await response.json();
+          const mappedOrders = data.map((order) => ({
+            id: `PED-${order.id.toString().padStart(3, "0")}`,
+            rawId: order.id,
+            date: new Date(order.createdAt).toLocaleDateString("es-ES", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            customerName: order.customerName,
+            customerPhone: order.customerPhone,
+            products: order.items.map((item) => ({
+              name: item.product.name,
+              quantity: `x${item.quantity}`,
+            })),
+            paymentPending: false, // You might want to add this to schema if needed
+            sellerName: order.seller
+              ? `${order.seller.firstName} ${order.seller.lastName}`
+              : "Sin vendedor",
+            location: order.zone ? order.zone.name : "Sin zona",
+            shippingCost: `Bs ${order.shippingCost}`,
+            total: `Bs ${order.total}`,
+            status: order.status,
+          }));
+          setOrders(mappedOrders);
+        }
+      } catch (error) {
+        console.error("Failed to fetch orders:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      const response = await fetch(`/api/orders/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (response.ok) {
+        // Optimistic update or refetch
+        setOrders((prev) =>
+          prev.map((order) =>
+            order.rawId === id ? { ...order, status: newStatus } : order,
+          ),
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
+  };
+
+  const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.products.some((p) =>
-        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+        p.name.toLowerCase().includes(searchTerm.toLowerCase()),
       );
 
     if (activeFilter === "all") return matchesSearch;
@@ -139,7 +105,7 @@ export default function OrdersPage() {
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
   const paginatedOrders = filteredOrders.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   return (
@@ -161,7 +127,11 @@ export default function OrdersPage() {
         />
       </div>
 
-      <OrderTable orders={paginatedOrders} />
+      <OrderTable
+        orders={paginatedOrders}
+        isLoading={isLoading}
+        onStatusChange={handleStatusChange}
+      />
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}

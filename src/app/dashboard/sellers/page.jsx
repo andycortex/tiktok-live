@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { SellersHeader } from "@/components/sellers/SellersHeader";
 import { FilterTabs } from "@/components/sellers/FilterTabs";
@@ -8,61 +8,86 @@ import { VendorTable } from "@/components/sellers/VendorTable";
 import Pagination from "@/components/ui/Pagination";
 import { Input } from "@/components/ui/Input";
 import { Search } from "lucide-react";
-
-const mockVendors = [
-  {
-    id: "1",
-    initials: "ML",
-    color: "bg-indigo-500", // Or a map of specific colors if needed
-    name: "María López",
-    joinDate: "Ene 2024",
-    status: "active",
-    sales: 18,
-    totalAmount: "Bs 2450",
-    commission: "Bs 368",
-    phone: "+591 7123 4567",
-    email: "maria.lopez@email.com",
-  },
-  {
-    id: "2",
-    initials: "CR",
-    color: "bg-pink-500",
-    name: "Carlos Ramos",
-    joinDate: "Feb 2024",
-    status: "active",
-    sales: 15,
-    totalAmount: "Bs 1890",
-    commission: "Bs 284",
-    phone: "+591 7234 5678",
-    email: "carlos.ramos@email.com",
-  },
-  {
-    id: "3",
-    initials: "AF",
-    color: "bg-emerald-600",
-    name: "Ana Flores",
-    joinDate: "Mar 2024",
-    status: "inactive",
-    sales: 22,
-    totalAmount: "Bs 3150",
-    commission: "Bs 473",
-    phone: "+591 7345 6789",
-    email: "ana.flores@email.com",
-  },
-];
-
-const filters = [
-  { id: "all", label: "Todos" },
-  { id: "active", label: "Activos" },
-  { id: "inactive", label: "Inactivos" },
-  { id: "top", label: "Top Performers" },
-];
+import Modal from "@/components/ui/Modal";
+import Button from "@/components/ui/Button";
 
 export default function SellersPage() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [vendors, setVendors] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [vendorToDelete, setVendorToDelete] = useState(null);
 
-  const filteredVendors = mockVendors.filter((vendor) => {
+  const fetchVendors = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/sellers");
+      if (response.ok) {
+        const data = await response.json();
+        // Map DB data to UI structure
+        const mappedData = data.map((seller) => ({
+          id: seller.id,
+          initials: `${seller.firstName[0]}${seller.lastName[0]}`.toUpperCase(),
+          color: "bg-orange-500", // Default color
+          name: `${seller.firstName} ${seller.lastName}`,
+          joinDate: new Date(seller.createdAt).toLocaleDateString("es-ES", {
+            month: "short",
+            year: "numeric",
+          }),
+          status: seller.status,
+          sales: 0, // Mock
+          totalAmount: "Bs 0", // Mock
+          commission: `${seller.commission}%`,
+          phone: seller.phone,
+          email: seller.email,
+        }));
+        setVendors(mappedData);
+      }
+    } catch (error) {
+      console.error("Failed to fetch sellers:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchVendors();
+  }, []);
+
+  const confirmDelete = (id) => {
+    setVendorToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!vendorToDelete) return;
+
+    try {
+      const response = await fetch(`/api/sellers/${vendorToDelete}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        fetchVendors(); // Refresh list
+        setDeleteModalOpen(false);
+        setVendorToDelete(null);
+      } else {
+        alert("Error al eliminar el vendedor");
+      }
+    } catch (error) {
+      console.error("Error deleting seller:", error);
+    }
+  };
+
+  const filters = [
+    { id: "all", label: "Todos" },
+    { id: "active", label: "Activos" },
+    { id: "inactive", label: "Inactivos" },
+    { id: "top", label: "Top Performers" },
+  ];
+
+  const filteredVendors = vendors.filter((vendor) => {
     const matchesSearch =
       vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vendor.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -77,7 +102,7 @@ export default function SellersPage() {
   const totalPages = Math.ceil(filteredVendors.length / itemsPerPage);
   const paginatedVendors = filteredVendors.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   return (
@@ -103,7 +128,11 @@ export default function SellersPage() {
         </div>
       </div>
 
-      <VendorTable vendors={paginatedVendors} />
+      <VendorTable
+        vendors={paginatedVendors}
+        isLoading={isLoading}
+        onDelete={confirmDelete}
+      />
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
@@ -111,6 +140,31 @@ export default function SellersPage() {
         totalItems={filteredVendors.length}
         itemsPerPage={itemsPerPage}
       />
+
+      <Modal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        title="Eliminar Vendedor"
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setDeleteModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              variant="danger"
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={handleDelete}
+            >
+              Eliminar
+            </Button>
+          </>
+        }
+      >
+        <p className="text-gray-600">
+          ¿Estás seguro de que deseas eliminar este vendedor? Esta acción no se
+          puede deshacer.
+        </p>
+      </Modal>
     </DashboardLayout>
   );
 }

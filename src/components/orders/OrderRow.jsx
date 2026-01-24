@@ -1,10 +1,9 @@
 import React from "react";
 import { Badge } from "../ui/Badge";
 import Button from "../ui/Button";
-import { Avatar } from "../ui/Avatar";
 import { Check, MessageSquare, Eye, AlertTriangle, User } from "lucide-react";
 
-export const OrderRow = ({ order }) => {
+export const OrderRow = ({ order, onStatusChange }) => {
   const getStatusBadge = (status) => {
     switch (status) {
       case "entregado":
@@ -20,6 +19,16 @@ export const OrderRow = ({ order }) => {
       default:
         return <Badge variant="neutral">{status}</Badge>;
     }
+  };
+
+  const handleWhatsApp = () => {
+    // Basic cleaning of phone number if needed
+    const phone = order.customerPhone.replace(/\D/g, "");
+    const message = `Hola ${order.customerName}, te escribo sobre tu pedido ${order.id}.`;
+    window.open(
+      `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+      "_blank",
+    );
   };
 
   return (
@@ -71,26 +80,25 @@ export const OrderRow = ({ order }) => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-right">
         <div className="flex items-center justify-end gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-gray-400 hover:text-green-500 hover:bg-green-50"
-          >
-            <Check className="h-4 w-4" />
-          </Button>
+          {order.status === "pendiente" && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-gray-400 hover:text-green-500 hover:bg-green-50"
+              onClick={() => onStatusChange(order.rawId, "confirmado")}
+              title="Confirmar Pedido"
+            >
+              <Check className="h-4 w-4" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-gray-400 hover:text-blue-500 hover:bg-blue-50"
+            onClick={handleWhatsApp}
+            title="Contactar por WhatsApp"
           >
             <MessageSquare className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-          >
-            <Eye className="h-4 w-4" />
           </Button>
         </div>
       </td>

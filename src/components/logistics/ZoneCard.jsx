@@ -10,8 +10,9 @@ import {
   Truck,
   Package,
 } from "lucide-react";
+import Link from "next/link";
 
-export const ZoneCard = ({ zone }) => {
+export const ZoneCard = ({ zone, onDelete }) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-full">
       <div className="p-6 flex-1">
@@ -85,17 +86,20 @@ export const ZoneCard = ({ zone }) => {
       </div>
 
       <div className="p-4 border-t border-gray-50 bg-gray-50/50 flex gap-3">
-        <Button
-          variant="outline"
-          className="flex-1 justify-center border-gray-200 text-gray-600 hover:text-gray-900 bg-white"
-          icon={Pencil}
-        >
-          Editar
-        </Button>
+        <Link href={`/dashboard/logistics/${zone.id}`} className="flex-1">
+          <Button
+            variant="outline"
+            className="w-full justify-center border-gray-200 text-gray-600 hover:text-gray-900 bg-white"
+            icon={Pencil}
+          >
+            Editar
+          </Button>
+        </Link>
         <Button
           variant="outline"
           className="flex-1 justify-center border-gray-200 text-gray-600 hover:text-red-600 hover:border-red-100 hover:bg-red-50 bg-white"
           icon={Trash2}
+          onClick={() => onDelete && onDelete(zone.id)}
         >
           Eliminar
         </Button>
