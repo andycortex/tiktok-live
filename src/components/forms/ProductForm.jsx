@@ -8,9 +8,11 @@ import TextArea from "../ui/TextArea";
 import { Upload, Save, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 
 export default function ProductForm({ initialData }) {
   const router = useRouter();
+  const { user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
@@ -19,10 +21,13 @@ export default function ProductForm({ initialData }) {
     category: initialData?.category || "",
     price: initialData?.price || "",
     stock: initialData?.stock || "",
+    commissionPercentage: initialData?.commissionPercentage || "0",
     visibility: initialData?.visibility || "public",
     status: initialData?.status || "active",
     description: initialData?.description || "",
+    description: initialData?.description || "",
     image: initialData?.image || "",
+    images: initialData?.images?.map((img) => img.url) || [], // Array of URLs
   });
 
   const handleChange = (e) => {
@@ -50,7 +55,10 @@ export default function ProductForm({ initialData }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...formData, ownerId: user?.id }),
       });
 
       if (!response.ok) {
@@ -78,66 +86,96 @@ export default function ProductForm({ initialData }) {
           <h3 className="text-base font-semibold leading-7 text-gray-900">
             Imágenes del Producto
           </h3>
-          <div className="mt-4 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10 bg-gray-50/50">
-            <div className="text-center">
-              {formData.image ? (
-                <div className="relative">
+          <p className="text-sm text-gray-500 mb-4">
+            Sube hasta 5 imágenes. La primera será la portada.
+          </p>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            {formData.images &&
+              formData.images.map((url, index) => (
+                <div key={index} className="relative group aspect-square">
                   <img
-                    src={formData.image}
-                    alt="Preview"
-                    className="h-48 w-full object-cover rounded-lg"
+                    src={url}
+                    alt={`Preview ${index}`}
+                    className="h-full w-full object-cover rounded-lg border border-gray-200"
                   />
                   <button
                     type="button"
-                    onClick={() =>
-                      setFormData((prev) => ({ ...prev, image: "" }))
-                    }
-                    className="absolute top-2 right-2 p-1 bg-white rounded-full shadow-sm hover:bg-gray-100"
+                    onClick={() => {
+                      const newImages = formData.images.filter(
+                        (_, i) => i !== index,
+                      );
+                      setFormData((prev) => ({
+                        ...prev,
+                        images: newImages,
+                        image: newImages[0] || "",
+                      }));
+                    }}
+                    className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <X className="h-4 w-4 text-gray-500" />
+                    <X className="h-4 w-4" />
                   </button>
+                  {index === 0 && (
+                    <span className="absolute bottom-2 left-2 px-2 py-1 bg-black/50 text-white text-xs rounded">
+                      Portada
+                    </span>
+                  )}
                 </div>
-              ) : (
-                <>
-                  <Upload
-                    className="mx-auto h-12 w-12 text-gray-300"
-                    aria-hidden="true"
-                  />
-                  <div className="mt-4 flex text-sm leading-6 text-gray-600 justify-center">
-                    <label
-                      htmlFor="file-upload"
-                      className="relative cursor-pointer rounded-md bg-white font-semibold text-orange-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-orange-600 focus-within:ring-offset-2 hover:text-orange-500"
-                    >
-                      <span>Subir archivo</span>
-                      <input
-                        id="file-upload"
-                        name="file-upload"
-                        type="file"
-                        className="sr-only"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              setFormData((prev) => ({
-                                ...prev,
-                                image: reader.result,
-                              }));
-                            };
-                            reader.readAsDataURL(file);
-                          }
-                        }}
-                      />
-                    </label>
-                    <p className="pl-1">o arrastrar y soltar</p>
-                  </div>
-                  <p className="text-xs leading-5 text-gray-600">
-                    PNG, JPG, GIF hasta 10MB
-                  </p>
-                </>
-              )}
-            </div>
+              ))}
+
+            {(!formData.images || formData.images.length < 5) && (
+              <label className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                  <p className="text-xs text-gray-500">Subir imagen</p>
+                </div>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  multiple
+                  onChange={async (e) => {
+                    const files = Array.from(e.target.files);
+                    if (files.length === 0) return;
+
+                    setIsLoading(true);
+                    try {
+                      // Upload each file
+                      const uploadPromises = files.map(async (file) => {
+                        const formData = new FormData();
+                        formData.append("file", file);
+                        const res = await fetch("/api/upload", {
+                          method: "POST",
+                          body: formData,
+                        });
+                        if (!res.ok) throw new Error("Failed");
+                        const data = await res.json();
+                        return data.url;
+                      });
+
+                      const uploadedUrls = await Promise.all(uploadPromises);
+
+                      setFormData((prev) => {
+                        const newImages = [
+                          ...(prev.images || []),
+                          ...uploadedUrls,
+                        ];
+                        return {
+                          ...prev,
+                          images: newImages,
+                          image: newImages[0] || "", // First image is main
+                        };
+                      });
+                    } catch (err) {
+                      console.error(err);
+                      setError("Error al subir algunas imágenes");
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                />
+              </label>
+            )}
           </div>
         </div>
 
@@ -202,6 +240,18 @@ export default function ProductForm({ initialData }) {
             placeholder="0"
             required
             value={formData.stock}
+            onChange={handleChange}
+          />
+
+          <Input
+            id="commissionPercentage"
+            label="Comisión para afiliados (%)"
+            type="number"
+            placeholder="Ej: 20"
+            min="0"
+            max="100"
+            required
+            value={formData.commissionPercentage}
             onChange={handleChange}
           />
 

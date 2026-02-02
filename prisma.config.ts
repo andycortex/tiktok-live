@@ -8,6 +8,6 @@ export default defineConfig({
   },
   engine: "classic",
   datasource: {
-    url: "mysql://root:master@localhost:3307/scraper-tiktok-comments-com",
+    url: "mysql://root:master@localhost:3307/taptap-social",
   },
 });

@@ -7,8 +7,10 @@ import { ProductTable } from "@/components/products/ProductTable";
 import Pagination from "@/components/ui/Pagination";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
+import { useUser } from "@/context/UserContext";
 
 export default function ProductsPage() {
+  const { user } = useUser();
   const [searchTerm, setSearchTerm] = React.useState("");
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [productToDelete, setProductToDelete] = React.useState(null);
@@ -18,7 +20,8 @@ export default function ProductsPage() {
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/products");
+      if (!user) return;
+      const response = await fetch(`/api/products?ownerId=${user.id}`);
       if (response.ok) {
         const data = await response.json();
         setProducts(data);
@@ -31,8 +34,10 @@ export default function ProductsPage() {
   };
 
   React.useEffect(() => {
-    fetchProducts();
-  }, []);
+    if (user) {
+      fetchProducts();
+    }
+  }, [user]);
 
   const confirmDelete = (id) => {
     setProductToDelete(id);

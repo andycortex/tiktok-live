@@ -18,10 +18,11 @@ import Button from "@/components/ui/Button";
 
 const menuItems = [
   { href: "/dashboard/products", label: "Productos", icon: Package },
-  { href: "/dashboard/sellers", label: "Vendedores", icon: Users },
+  // { href: "/dashboard/sellers", label: "Vendedores", icon: Users },
   { href: "/dashboard/sales", label: "Ventas", icon: TrendingUp },
   { href: "/dashboard/orders", label: "Pedidos", icon: ShoppingCart },
   { href: "/dashboard/logistics", label: "Logística", icon: Truck },
+  { href: "/dashboard/affiliations", label: "Afiliados", icon: Users },
   { href: "/live", label: "Emitir Live", icon: Tv },
 ];
 

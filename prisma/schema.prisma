@@ -22,6 +22,18 @@ model user {
   passwordResetExpires DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  role      Role     @default(USER)
+
+  // Relations
+  ownedProducts product[]     @relation("ProductOwner")
+  affiliations  affiliation[]
+  sales         order[]       @relation("SellerOrders")
+}
+
+enum Role {
+  USER
+  VENDEDOR
+  PROPIETARIO
 }
 
 model product {
@@ -31,26 +43,44 @@ model product {
   category    String
   price       Float
   stock       Int
+  commissionPercentage Float @default(0)
   visibility  String   @default("public")
   status      String   @default("active")
   description String?
   image       String?  @db.LongText
   createdAt   DateTime @default(now())
-  updatedAt   DateTime    @updatedAt
+  updatedAt   DateTime @updatedAt
+  
+
+  
+  // Relations
+  ownerId     Int
+  owner       user     @relation("ProductOwner", fields: [ownerId], references: [id])
   orderItems  orderItem[]
+  affiliations affiliation[]
+  images      ProductImage[]
 }
 
-model seller {
-  id          Int      @id @default(autoincrement())
-  firstName   String
-  lastName    String
-  email       String   @unique
-  phone       String
-  status      String   @default("active")
-  commission  Float    @default(0)
-  createdAt   DateTime @updatedAt
-  updatedAt   DateTime @updatedAt
-  orders      order[]
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  url       String   @db.LongText
+  productId Int
+  product   product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model affiliation {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      user     @relation(fields: [userId], references: [id])
+  productId Int
+  product   product  @relation(fields: [productId], references: [id])
+  status    String   @default("PENDING") // PENDING, ACTIVE, REJECTED
+  commission Float?  @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId])
 }
 
 model zone {
@@ -75,8 +105,10 @@ model order {
   status        String      @default("pendiente") // pendiente, confirmado, en_camino, entregado, cancelado
   total         Float
   shippingCost  Float
+  
+  // Relations
   sellerId      Int?
-  seller        seller?     @relation(fields: [sellerId], references: [id])
+  seller        user?       @relation("SellerOrders", fields: [sellerId], references: [id])
   zoneId        Int?
   zone          zone?       @relation(fields: [zoneId], references: [id])
   items         orderItem[]

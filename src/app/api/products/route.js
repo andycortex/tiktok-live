@@ -3,10 +3,21 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const ownerId = searchParams.get("ownerId");
+
   try {
+    const where = ownerId ? { ownerId: parseInt(ownerId) } : {};
+
     const products = await prisma.product.findMany({
+      where,
       orderBy: { createdAt: "desc" },
+      include: {
+        _count: {
+          select: { affiliations: true },
+        },
+      },
     });
     return NextResponse.json(products);
   } catch (error) {
@@ -31,12 +42,14 @@ export async function POST(request) {
       status,
       description,
       image,
+      ownerId,
+      images, // Expecting an array of URLs strings
     } = body;
 
     // Basic validation
-    if (!name || !code || !price || !category) {
+    if (!name || !code || !price || !category || !ownerId) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Missing required fields (including ownerId)" },
         { status: 400 },
       );
     }
@@ -53,6 +66,19 @@ export async function POST(request) {
       );
     }
 
+    // Check if owner exists
+    const userExists = await prisma.user.findUnique({
+      where: { id: parseInt(ownerId) },
+    });
+
+    if (!userExists) {
+      return NextResponse.json(
+        { error: "Invalid ownerId: User does not exist" },
+        { status: 400 },
+      );
+    }
+
+    // Create product and images
     const newProduct = await prisma.product.create({
       data: {
         name,
@@ -63,7 +89,15 @@ export async function POST(request) {
         visibility: visibility || "public",
         status: status || "active",
         description,
-        image,
+        image: image || (images && images.length > 0 ? images[0] : null), // Use first image as main if not provided
+        ownerId: parseInt(ownerId),
+        commissionPercentage: parseFloat(body.commissionPercentage) || 0,
+        images: {
+          create:
+            images && Array.isArray(images)
+              ? images.map((url) => ({ url }))
+              : [],
+        },
       },
     });
 

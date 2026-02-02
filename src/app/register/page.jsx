@@ -18,6 +18,7 @@ const RegisterPage = () => {
     direccion: "",
     empresa: "",
     tiktok: "",
+    role: "USER",
     terms: false,
   });
   const [loading, setLoading] = useState(false);
@@ -99,6 +100,37 @@ const RegisterPage = () => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <i className="fas fa-id-badge text-purple-600"></i>
+                      Tipo de Cuenta
+                    </h3>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Selecciona tu rol{" "}
+                        <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <select
+                          id="role"
+                          name="role"
+                          required
+                          className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent input-focus appearance-none bg-white"
+                          value={formData.role}
+                          onChange={(e) =>
+                            handleInputChange("role")(e.target.value)
+                          }
+                        >
+                          <option value="USER">Usuario</option>
+                          <option value="VENDEDOR">Vendedor</option>
+                          <option value="PROPIETARIO">Propietario</option>
+                        </select>
+                        <i className="fas fa-users absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <i className="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                       <i className="fas fa-user text-purple-600"></i>

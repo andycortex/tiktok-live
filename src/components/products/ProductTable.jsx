@@ -67,15 +67,21 @@ export const ProductTable = ({ products, isLoading, onDelete }) => {
               </th>
               <th
                 scope="col"
-                className="hidden md:table-cell px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider"
+                className="hidden lg:table-cell px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider"
               >
-                % Vendedor
+                Afiliados
               </th>
               <th
                 scope="col"
                 className="hidden lg:table-cell px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider"
               >
                 Stock
+              </th>
+              <th
+                scope="col"
+                className="hidden xl:table-cell px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider"
+              >
+                Comisión
               </th>
               <th
                 scope="col"

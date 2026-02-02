@@ -8,18 +8,81 @@ import TextArea from "../ui/TextArea";
 import { Save, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 
 export default function OrderForm() {
   const router = useRouter();
+  const { user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [affiliates, setAffiliates] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState("");
+  const [quantity, setQuantity] = useState(1);
+  const [selectedSeller, setSelectedSeller] = useState("");
+
+  // Load owner's products on mount
+  React.useEffect(() => {
+    if (user) {
+      fetch(`/api/products?ownerId=${user.id}&includeCount=false`)
+        .then((res) => res.json())
+        .then((data) => setProducts(data))
+        .catch((err) => console.error(err));
+    }
+  }, [user]);
+
+  // Load affiliates when product changes
+  React.useEffect(() => {
+    if (selectedProduct) {
+      fetch(`/api/products/${selectedProduct}/affiliates`)
+        .then((res) => res.json())
+        .then((data) => setAffiliates(data))
+        .catch((err) => console.error(err));
+      setSelectedSeller(""); // Reset seller
+    } else {
+      setAffiliates([]);
+    }
+  }, [selectedProduct]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
+
+    try {
+      if (!selectedProduct) throw new Error("Selecciona un producto");
+
+      const orderData = {
+        customerName: e.target.customerName.value,
+        customerPhone: e.target.customerPhone.value,
+        items: [
+          {
+            productId: parseInt(selectedProduct),
+            quantity: parseInt(quantity),
+          },
+        ],
+        sellerId: selectedSeller ? parseInt(selectedSeller) : null, // If empty, it's a direct sale
+        zoneId: 1, // Default zone or handle selection
+        shippingCost: 0,
+      };
+
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
+      });
+
+      if (res.ok) {
+        router.push("/dashboard/orders");
+        router.refresh();
+      } else {
+        const error = await res.json();
+        alert("Error: " + error.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error al crear el pedido");
+    } finally {
       setIsLoading(false);
-      router.push("/dashboard/orders");
-    }, 1000);
+    }
   };
 
   return (
@@ -28,20 +91,34 @@ export default function OrderForm() {
       className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8"
     >
       <div className="space-y-8">
-        {/* Product Selection Mockup */}
+        {/* Product Selection */}
         <div>
           <h3 className="text-base font-semibold leading-7 text-gray-900">
             Productos
           </h3>
-          <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-            <Input
-              icon={Search}
-              placeholder="Buscar producto para agregar..."
-              className="bg-white"
+          <div className="mt-4 p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-4">
+            <Select
+              id="productSelect"
+              label="Seleccionar Producto"
+              options={products.map((p) => ({
+                value: p.id,
+                label: `${p.name} - Bs ${p.price}`,
+              }))}
+              value={selectedProduct}
+              onChange={(e) => setSelectedProduct(e.target.value)}
+              required
             />
-            <div className="text-sm text-gray-500 text-center py-8">
-              Busca y selecciona productos para armar el pedido
-            </div>
+            {selectedProduct && (
+              <Input
+                id="quantity"
+                label="Cantidad"
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                required
+              />
+            )}
           </div>
         </div>
 
@@ -77,11 +154,16 @@ export default function OrderForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
             <Select
               id="seller"
-              label="Vendedor Asignado"
+              label="Vendedor Asignado (Afiliado)"
               options={[
-                { value: "ana", label: "Ana Flores" },
-                { value: "carlos", label: "Carlos Ramos" },
+                { value: "", label: "Venta Directa (Sin afiliado)" },
+                ...affiliates.map((a) => ({
+                  value: a.id,
+                  label: `${a.name} (${a.email})`,
+                })),
               ]}
+              value={selectedSeller}
+              onChange={(e) => setSelectedSeller(e.target.value)}
             />
             <Select
               id="status"

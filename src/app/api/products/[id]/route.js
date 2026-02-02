@@ -9,6 +9,18 @@ export async function GET(request, { params }) {
   try {
     const product = await prisma.product.findUnique({
       where: { id: parseInt(id) },
+      include: {
+        images: true, // Include gallery
+        owner: {
+          select: {
+            id: true,
+            nombre: true,
+            apellido: true,
+            email: true,
+            empresa: true,
+          },
+        },
+      },
     });
 
     if (!product) {
@@ -40,21 +52,48 @@ export async function PUT(request, { params }) {
       status,
       description,
       image,
+      images, // Array of URLs
+      commissionPercentage,
     } = body;
 
-    const updatedProduct = await prisma.product.update({
-      where: { id: parseInt(id) },
-      data: {
-        name,
-        code,
-        category,
-        price: parseFloat(price),
-        stock: parseInt(stock),
-        visibility,
-        status,
-        description,
-        image,
-      },
+    // Transaction to update product and replace images
+    const updatedProduct = await prisma.$transaction(async (tx) => {
+      // 1. Update basic fields
+      const prod = await tx.product.update({
+        where: { id: parseInt(id) },
+        data: {
+          name,
+          code,
+          category,
+          price: parseFloat(price),
+          stock: parseInt(stock),
+          visibility,
+          status,
+          description,
+          image: image || (images && images.length > 0 ? images[0] : null),
+          commissionPercentage: parseFloat(commissionPercentage) || 0,
+        },
+      });
+
+      // 2. Handle images if provided
+      if (images && Array.isArray(images)) {
+        // Delete existing
+        await tx.productImage.deleteMany({
+          where: { productId: prod.id },
+        });
+
+        // Create new
+        if (images.length > 0) {
+          await tx.productImage.createMany({
+            data: images.map((url) => ({
+              productId: prod.id,
+              url,
+            })),
+          });
+        }
+      }
+
+      return prod;
     });
 
     return NextResponse.json(updatedProduct);

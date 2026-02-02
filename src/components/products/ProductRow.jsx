@@ -68,11 +68,14 @@ export const ProductRow = ({ product, isSelected, onSelect, onDelete }) => {
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-orange-500">
         Bs {product.price}
       </td>
-      <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
-        {product.vendorPercent}%
+      <td className="hidden lg:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+        {product._count?.affiliations || 0}
       </td>
       <td className="hidden lg:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
         {product.stock}
+      </td>
+      <td className="hidden xl:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+        {product.commissionPercentage}%
       </td>
       <td className="hidden xl:table-cell px-6 py-4 whitespace-nowrap">
         {getVisibilityBadge(product.visibility)}
