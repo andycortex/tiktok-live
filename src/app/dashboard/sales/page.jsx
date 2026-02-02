@@ -83,15 +83,15 @@ export default function SalesPage() {
     (sale) =>
       sale.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       sale.buyerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      sale.sellerName.toLowerCase().includes(searchTerm.toLowerCase())
+      sale.sellerName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 100;
   const [currentPage, setCurrentPage] = React.useState(1);
   const totalPages = Math.ceil(filteredSales.length / itemsPerPage);
   const paginatedSales = filteredSales.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   return (

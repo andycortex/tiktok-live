@@ -70,7 +70,7 @@ export default function ProductsPage() {
       product.code.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 100;
   const [currentPage, setCurrentPage] = React.useState(1);
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const paginatedProducts = filteredProducts.slice(

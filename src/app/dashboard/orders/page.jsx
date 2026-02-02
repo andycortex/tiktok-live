@@ -100,7 +100,7 @@ export default function OrdersPage() {
     return matchesSearch && order.status === activeFilter;
   });
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 100;
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
   const paginatedOrders = filteredOrders.slice(

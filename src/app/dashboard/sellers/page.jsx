@@ -97,7 +97,7 @@ export default function SellersPage() {
     return matchesSearch && vendor.status === activeFilter;
   });
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 100;
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(filteredVendors.length / itemsPerPage);
   const paginatedVendors = filteredVendors.slice(
