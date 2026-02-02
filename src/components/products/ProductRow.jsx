@@ -56,8 +56,8 @@ export const ProductRow = ({ product, isSelected, onSelect, onDelete }) => {
           {/* Image in design has rounded-xl and maybe a background for the icon */}
           <div>
             <div className="text-sm font-semibold text-gray-900">
-              {product.name.length > 150
-                ? product.name.substring(0, 150) + "..."
+              {product.name.length > 50
+                ? product.name.substring(0, 50) + "..."
                 : product.name}
             </div>
             <div className="text-xs text-gray-400">{product.code}</div>
