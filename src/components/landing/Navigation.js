@@ -167,9 +167,12 @@ export default function Navigation() {
             >
               Mi cuenta
             </Link>
-            <button className="w-full px-6 py-2.5 bg-orange-500 text-white rounded-lg font-medium">
+            <Link
+              href="/register"
+              className="w-full block text-center px-6 py-2.5 bg-orange-500 text-white rounded-lg font-medium"
+            >
               Registrarse
-            </button>
+            </Link>
           </div>
         </div>
       </div>
